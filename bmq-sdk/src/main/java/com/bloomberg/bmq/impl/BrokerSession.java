@@ -109,7 +109,7 @@ public final class BrokerSession
     private volatile ScheduledFuture<?> onStopTimeoutFuture;
     private volatile HostHealthState hostHealthState = HostHealthState.Healthy;
 
-    private int numPendingHostHealthRequests = 0;
+    private final HealthManagerImpl healthManager;
 
     public boolean isInSessionExecutor() {
         return threadId == Thread.currentThread().getId();
@@ -128,50 +128,6 @@ public final class BrokerSession
         boolean isHostHealthy();
 
         void checkHostIsStableHealthy();
-    }
-
-    private class HealthManagerImpl implements HealthManager {
-        @Override
-        public void onHealthRequest() {
-            assert isInSessionExecutor();
-
-            // Increment number of Host Health requests outstanding.
-            ++numPendingHostHealthRequests;
-            logger.debug(
-                    "Incremented num of pending host health requests to {}",
-                    numPendingHostHealthRequests);
-        }
-
-        @Override
-        public void onHealthResponse() {
-            assert isInSessionExecutor();
-
-            // Indicate one fewer host-health queue request is pending.
-            //
-            // A `resume` request may fire a HOST_HEALTH_RESTORED event only
-            // when this counter reaches zero.
-            if (numPendingHostHealthRequests <= 0) {
-                logger.warn("Attempt to decrement num of pending host health requests below zero");
-                return;
-            }
-
-            --numPendingHostHealthRequests;
-            logger.debug(
-                    "Decremented num of pending host health requests to {}",
-                    numPendingHostHealthRequests);
-        }
-
-        @Override
-        public boolean isHostHealthy() {
-            assert isInSessionExecutor();
-            return BrokerSession.this.isHostHealthy();
-        }
-
-        @Override
-        public void checkHostIsStableHealthy() {
-            assert isInSessionExecutor();
-            BrokerSession.this.checkHostIsStableHealthy();
-        }
     }
 
     public static BrokerSession createInstance(
@@ -248,6 +204,11 @@ public final class BrokerSession
         this.eventHandler = eventHandler;
         threadPool = Executors.newSingleThreadExecutor();
         queueStateManager = QueueStateManager.createInstance();
+        healthManager =
+                new HealthManagerImpl(
+                        this::isInSessionExecutor,
+                        this::isHostHealthy,
+                        this::checkHostIsStableHealthy);
         strategyFactory =
                 QueueControlStrategyFactory.create(
                         brokerConnection,
@@ -256,7 +217,7 @@ public final class BrokerSession
                         queueStateManager,
                         this::enqueueEvent,
                         this.scheduler,
-                        new HealthManagerImpl());
+                        healthManager);
         lateResponseHandler =
                 LateResponseHandler.createInstance(
                         queueStateManager, strategyFactory, this.sessionOptions);
@@ -865,7 +826,7 @@ public final class BrokerSession
         // unhealthy states. Our session in this case never entered a completely
         // "healthy" state, so we never issued a corresponding "health restored"
         // event. We therefore also elide this intermediate "host unhealthy" event.
-        if (numPendingHostHealthRequests == 0) {
+        if (healthManager.getNumPendingHostHealthRequests() == 0) {
             enqueueHostUnhealthy();
         }
 
@@ -913,10 +874,7 @@ public final class BrokerSession
         // ensure that no calls to 'resumeQueue' inadvertently issue a
         // redundant 'HOST_HEALTH_RESUMED' event (which could otherwise occur in
         // certain cases, e.g., write-only queues, request failure, etc).
-        ++numPendingHostHealthRequests;
-        logger.debug(
-                "Incremented (guard) num of pending host health requests to {}",
-                numPendingHostHealthRequests);
+        healthManager.incrementPendingRequests();
 
         // Resume health sensitive queues if we are connected
         if (isStarted()) {
@@ -935,11 +893,7 @@ public final class BrokerSession
                     .forEach(this::resumeQueue);
         }
 
-        // Decrement our counter "guard".
-        --numPendingHostHealthRequests;
-        logger.debug(
-                "Decremented (guard) num of pending host health requests to {}",
-                numPendingHostHealthRequests);
+        healthManager.decrementPendingRequests();
 
         // If we aren't waiting for any queues to resume, then just immediately
         // publish the session event ourselves.
@@ -1004,7 +958,7 @@ public final class BrokerSession
 
         // If there are no more outstanding requests, AND the host remains
         // healthy, then issue a HOST_HEALTH_RESTORED event.
-        if (numPendingHostHealthRequests == 0 && isHostHealthy()) {
+        if (healthManager.getNumPendingHostHealthRequests() == 0 && isHostHealthy()) {
             enqueueHostHealthRestored();
         }
     }

@@ -19,11 +19,6 @@ import com.bloomberg.bmq.ResultCodes.GenericResult;
 import com.bloomberg.bmq.impl.BrokerSession;
 import com.bloomberg.bmq.impl.QueueId;
 import com.bloomberg.bmq.impl.QueueImpl;
-import com.bloomberg.bmq.impl.events.AckMessageEvent;
-import com.bloomberg.bmq.impl.events.BrokerSessionEvent;
-import com.bloomberg.bmq.impl.events.BrokerSessionEventHandler;
-import com.bloomberg.bmq.impl.events.Event;
-import com.bloomberg.bmq.impl.events.PushMessageEvent;
 import com.bloomberg.bmq.impl.events.QueueControlEvent;
 import com.bloomberg.bmq.impl.events.QueueControlEventHandler;
 import com.bloomberg.bmq.impl.infr.net.NettyTcpConnectionFactory;
@@ -41,7 +36,6 @@ import com.bloomberg.bmq.impl.infr.proto.PutMessageImpl;
 import com.bloomberg.bmq.impl.infr.proto.ShortMessageProperty;
 import com.bloomberg.bmq.impl.infr.proto.StringMessageProperty;
 import com.bloomberg.bmq.impl.infr.util.Argument;
-import com.bloomberg.bmq.impl.intf.QueueHandle;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
@@ -428,8 +422,7 @@ public final class Session implements AbstractSession {
     private final ScheduledExecutorService scheduler;
     private final BrokerSession brokerSession;
     private final SessionEventHandler sessionEventHandler;
-    private final BrokerSessionEventHandler dispatcher;
-    private final EventDispatcher eventDispatcher;
+    private final SessionEventDispatcher sessionEventDispatcher;
 
     /**
      * Creates a new session object with default session options.
@@ -457,14 +450,17 @@ public final class Session implements AbstractSession {
 
         sessionEventHandler = eh;
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        dispatcher = new BrokerSessionEventDispatcher();
-        eventDispatcher = new EventDispatcher();
+        // Use a holder array to allow the lambda to reference the dispatcher
+        // before it is assigned to the final field.
+        final SessionEventDispatcher[] holder = new SessionEventDispatcher[1];
         brokerSession =
                 BrokerSession.createInstance(
                         so,
                         new NettyTcpConnectionFactory(),
                         scheduler,
-                        event -> event.dispatch(eventDispatcher));
+                        event -> event.dispatch(holder[0].getEventHandler()));
+        sessionEventDispatcher = new SessionEventDispatcher(this, eh, brokerSession);
+        holder[0] = sessionEventDispatcher;
     }
 
     /**
@@ -610,316 +606,6 @@ public final class Session implements AbstractSession {
         @Override
         public AbstractSession session() {
             return Session.this;
-        }
-    }
-
-    @Immutable
-    abstract class SessionEventAdapter extends EventAdapter implements SessionEvent {
-        private final long creationTime;
-        private final String errorDescription;
-
-        protected SessionEventAdapter(BrokerSessionEvent event) {
-            Argument.expectNonNull(event, "event");
-
-            creationTime = event.getCreationTime();
-            errorDescription = event.getErrorDescription();
-        }
-
-        public abstract void dispatch();
-
-        @Override
-        public String toString() {
-            return "Event [Type: "
-                    + this.type()
-                    + " Creation time in broker session: "
-                    + creationTime
-                    + " Description: "
-                    + errorDescription
-                    + "]";
-        }
-    }
-
-    @Immutable
-    class UnknownEvent extends SessionEventAdapter {
-
-        UnknownEvent(BrokerSessionEvent event) {
-            super(event);
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleSessionEvent(this);
-        }
-
-        @Override
-        public Type type() {
-            return Type.UNKNOWN_SESSION_EVENT;
-        }
-    }
-
-    @Immutable
-    class ConnectionLostEvent extends SessionEventAdapter implements SessionEvent.ConnectionLost {
-
-        ConnectionLostEvent(BrokerSessionEvent event) {
-            super(event);
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleConnectionLostSessionEvent(this);
-        }
-    }
-
-    @Immutable
-    class ReconnectedEvent extends SessionEventAdapter implements SessionEvent.Reconnected {
-
-        ReconnectedEvent(BrokerSessionEvent event) {
-            super(event);
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleReconnectedSessionEvent(this);
-        }
-    }
-
-    @Immutable
-    class StateRestoredEvent extends SessionEventAdapter implements SessionEvent.StateRestored {
-
-        StateRestoredEvent(BrokerSessionEvent event) {
-            super(event);
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleStateRestoredSessionEvent(this);
-        }
-    }
-
-    @Immutable
-    class SlowConsumerHighWatermarkEvent extends SessionEventAdapter
-            implements SessionEvent.SlowConsumerHighWatermark {
-
-        SlowConsumerHighWatermarkEvent(BrokerSessionEvent event) {
-            super(event);
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleSlowConsumerHighWatermarkEvent(this);
-        }
-    }
-
-    @Immutable
-    class SlowConsumerNormalEvent extends SessionEventAdapter
-            implements SessionEvent.SlowConsumerNormal {
-
-        SlowConsumerNormalEvent(BrokerSessionEvent event) {
-            super(event);
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleSlowConsumerNormalEvent(this);
-        }
-    }
-
-    @Immutable
-    class StartStatusEvent extends SessionEventAdapter implements SessionEvent.StartStatus {
-
-        private final GenericResult result;
-
-        StartStatusEvent(BrokerSessionEvent event, GenericResult res) {
-            super(event);
-            result = Argument.expectNonNull(res, "res");
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleStartStatusSessionEvent(this);
-        }
-
-        @Override
-        public GenericResult result() {
-            return result;
-        }
-    }
-
-    @Immutable
-    class StopStatusEvent extends SessionEventAdapter implements SessionEvent.StopStatus {
-
-        private final GenericResult result;
-
-        StopStatusEvent(BrokerSessionEvent event, GenericResult res) {
-            super(event);
-            result = Argument.expectNonNull(res, "res");
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleStopStatusSessionEvent(this);
-        }
-
-        @Override
-        public GenericResult result() {
-            return result;
-        }
-    }
-
-    @Immutable
-    class HostUnhealthyEvent extends SessionEventAdapter implements SessionEvent.HostUnhealthy {
-
-        HostUnhealthyEvent(BrokerSessionEvent event) {
-            super(event);
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleHostUnhealthySessionEvent(this);
-        }
-    }
-
-    @Immutable
-    class HostHealthRestoredEvent extends SessionEventAdapter
-            implements SessionEvent.HostHealthRestored {
-
-        HostHealthRestoredEvent(BrokerSessionEvent event) {
-            super(event);
-        }
-
-        @Override
-        public void dispatch() {
-            Session.this.sessionEventHandler.handleHostHealthRestoredSessionEvent(this);
-        }
-    }
-
-    private static void handleEvent(SessionEventAdapter event) {
-        event.dispatch();
-    }
-
-    @Immutable
-    private class BrokerSessionEventDispatcher implements BrokerSessionEventHandler {
-        @Override
-        public void handleConnected(BrokerSessionEvent event) {
-            handleEvent(new StartStatusEvent(event, GenericResult.SUCCESS));
-        }
-
-        @Override
-        public void handleDisconnected(BrokerSessionEvent event) {
-            handleEvent(new StopStatusEvent(event, GenericResult.SUCCESS));
-        }
-
-        @Override
-        public void handleConnectionLost(BrokerSessionEvent event) {
-            handleEvent(new ConnectionLostEvent(event));
-        }
-
-        @Override
-        public void handleReconnected(BrokerSessionEvent event) {
-            handleEvent(new ReconnectedEvent(event));
-        }
-
-        @Override
-        public void handleStateRestored(BrokerSessionEvent event) {
-            handleEvent(new StateRestoredEvent(event));
-        }
-
-        @Override
-        public void handleConnectionTimeout(BrokerSessionEvent event) {
-            handleEvent(new StartStatusEvent(event, GenericResult.TIMEOUT));
-        }
-
-        @Override
-        public void handleSlowConsumerNormal(BrokerSessionEvent event) {
-            handleEvent(new SlowConsumerNormalEvent(event));
-        }
-
-        @Override
-        public void handleSlowConsumerHighWatermark(BrokerSessionEvent event) {
-            handleEvent(new SlowConsumerHighWatermarkEvent(event));
-        }
-
-        @Override
-        public void handleConnectionInProgress(BrokerSessionEvent event) {
-            handleEvent(new StartStatusEvent(event, GenericResult.NOT_SUPPORTED));
-        }
-
-        @Override
-        public void handleDisconnectionTimeout(BrokerSessionEvent event) {
-            handleEvent(new StopStatusEvent(event, GenericResult.TIMEOUT));
-        }
-
-        @Override
-        public void handleDisconnectionInProgress(BrokerSessionEvent event) {
-            handleEvent(new StopStatusEvent(event, GenericResult.NOT_SUPPORTED));
-        }
-
-        @Override
-        public void handleHostUnhealthy(BrokerSessionEvent event) {
-            handleEvent(new HostUnhealthyEvent(event));
-        }
-
-        @Override
-        public void handleHostHealthRestored(BrokerSessionEvent event) {
-            handleEvent(new HostHealthRestoredEvent(event));
-        }
-
-        @Override
-        public void handleError(BrokerSessionEvent event) {
-            handleEvent(new UnknownEvent(event));
-        }
-
-        @Override
-        public void handleCancelled(BrokerSessionEvent event) {
-            handleEvent(new StartStatusEvent(event, GenericResult.CANCELED));
-        }
-    }
-
-    @Immutable
-    private class EventDispatcher implements com.bloomberg.bmq.impl.events.EventHandler {
-
-        @Override
-        public void handleEvent(Event event) {
-            logger.error("Unexpected event caught: {}", event);
-        }
-
-        @Override
-        public void handlePushMessageEvent(PushMessageEvent ev) {
-            PushMessageImpl msg = ev.rawMessage();
-            Integer[] subQueueIds = msg.subQueueIds();
-            for (Integer subQId : subQueueIds) {
-                QueueHandle queue = brokerSession.lookupQueue(subQId);
-                if (queue != null) {
-                    queue.handlePushMessage(msg);
-                } else {
-                    logger.warn("Received PUSH message for unknown queue: {}", msg);
-                }
-            }
-        }
-
-        @Override
-        public void handleAckMessageEvent(AckMessageEvent ev) {
-            AckMessageImpl msg = ev.rawMessage();
-            QueueId qid = QueueId.createInstance(msg.queueId(), 0);
-            QueueHandle queue = brokerSession.lookupQueue(qid);
-            if (queue != null) {
-                queue.handleAckMessage(msg);
-            } else {
-                logger.warn("Received ACK message for unknown queue: {}", msg);
-            }
-        }
-
-        @Override
-        public void handleQueueEvent(QueueControlEvent ev) {
-            QueueHandle queue = ev.getQueue();
-            if (queue == null)
-                throw new RuntimeException("Failure: Queue is null. Ev: " + ev.toString());
-            queue.handleQueueEvent(ev);
-        }
-
-        @Override
-        public void handleBrokerSessionEvent(BrokerSessionEvent event) {
-            event.dispatch(Session.this.dispatcher);
         }
     }
 
