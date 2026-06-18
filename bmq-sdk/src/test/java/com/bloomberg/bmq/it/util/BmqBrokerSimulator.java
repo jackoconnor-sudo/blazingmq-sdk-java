@@ -350,7 +350,7 @@ public class BmqBrokerSimulator implements TestTcpServer, Runnable {
         pushMsg.appData().setPayload(ByteBuffer.wrap(PAYLOAD.getBytes()));
 
         PushEventBuilder builder = new PushEventBuilder();
-        builder.packMessage(pushMsg, isOldStyleMessageProperties());
+        builder.packMessage(pushMsg);
 
         write(builder.build());
     }

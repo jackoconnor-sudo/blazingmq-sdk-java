@@ -78,7 +78,6 @@ public class TcpBrokerConnection
 
     static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String MPS_EX_FEATURE = "MPS:MESSAGE_PROPERTIES_EX";
     private static AtomicInteger counter = new AtomicInteger(0);
 
     private final EventsStats eventsStats; // thread-safe
@@ -95,7 +94,6 @@ public class TcpBrokerConnection
     private volatile StopCallback stopCallback;
 
     private volatile Duration stopTimeout;
-    private volatile boolean isOldStyleMessageProperties = false;
 
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> onNegotiationTimeoutFuture;
@@ -369,7 +367,7 @@ public class TcpBrokerConnection
         clientIdentity.setHostName(SystemUtil.getHostName());
         clientIdentity.setPid(SystemUtil.getProcessId());
         clientIdentity.setSessionId(sessionId);
-        clientIdentity.setFeatures("PROTOCOL_ENCODING:JSON;" + MPS_EX_FEATURE);
+        clientIdentity.setFeatures("PROTOCOL_ENCODING:JSON;MPS:MESSAGE_PROPERTIES_EX");
         clientIdentity.setClusterName("");
         clientIdentity.setClusterNodeId(-1);
         clientIdentity.setSdkLanguage(ClientLanguage.E_JAVA);
@@ -418,15 +416,6 @@ public class TcpBrokerConnection
 
             brokerIdentity = resp.getOriginalRequest();
 
-            // TODO: remove after 2nd rollout of "new style" brokers
-            String brokerFeatures = brokerIdentity.features();
-            isOldStyleMessageProperties =
-                    brokerFeatures == null
-                            || brokerFeatures.isEmpty()
-                            || !brokerFeatures.toUpperCase().contains(MPS_EX_FEATURE);
-            logger.info(
-                    "Broker supports new style message properties: {}",
-                    !isOldStyleMessageProperties);
             isValid = true;
         } else {
             logger.error("Broker response is invalid");
@@ -522,11 +511,6 @@ public class TcpBrokerConnection
             }
         }
         return GenericResult.SUCCESS;
-    }
-
-    @Override
-    public boolean isOldStyleMessageProperties() {
-        return isOldStyleMessageProperties;
     }
 
     @Override

@@ -35,7 +35,7 @@ class PushEventImplTest {
 
     @Test
     void testDispatchUnknownCompression() throws IOException {
-        for (boolean isOldStyleProperties : new boolean[] {true, false}) {
+        {
             final byte[] bytes = new byte[Protocol.COMPRESSION_MIN_APPDATA_SIZE + 1];
 
             bytes[0] = 1;
@@ -64,10 +64,7 @@ class PushEventImplTest {
 
             header.setLength(
                     EventHeader.HEADER_SIZE
-                            + (PushHeader.HEADER_SIZE_FOR_SCHEMA_ID
-                                            + unpackedSize
-                                            + numPaddingBytes)
-                                    * NUM);
+                            + (PushHeader.HEADER_SIZE + unpackedSize + numPaddingBytes) * NUM);
 
             header.streamOut(bbos);
 
@@ -77,7 +74,6 @@ class PushEventImplTest {
                 pushMsg.appData().setPayload(ByteBuffer.wrap(bytes));
 
                 pushMsg.appData().setProperties(props);
-                pushMsg.appData().setIsOldStyleProperties(isOldStyleProperties);
 
                 pushMsg.compressData();
 

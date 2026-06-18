@@ -87,6 +87,8 @@ public class MessagesTestSamples {
             new SampleFileMetadata("/data/msg_confirm_15082018.bin", 252);
     public static final SampleFileMetadata PUSH_MULTI_MSG =
             new SampleFileMetadata("/data/msg_push_multi.bin", 256);
+    public static final SampleFileMetadata PUSH_MULTI_MSG_NEW =
+            new SampleFileMetadata("/data/msg_push_multi_new.bin", 256);
     public static final SampleFileMetadata PUSH_MSG_ZLIB =
             new SampleFileMetadata("/data/msg_push_zlib.bin", 64);
     public static final SampleFileMetadata PUSH_WITH_SUBQUEUE_IDS_MSG =
@@ -95,6 +97,8 @@ public class MessagesTestSamples {
             new SampleFileMetadata("/data/msg_put_zlib_27042018.bin", 132);
     public static final SampleFileMetadata PUT_MULTI_MSG =
             new SampleFileMetadata("/data/msg_put_multi.bin", 264);
+    public static final SampleFileMetadata PUT_MULTI_MSG_NEW =
+            new SampleFileMetadata("/data/msg_put_multi_new.bin", 264);
     public static final SampleFileMetadata MSG_PROPS_OLD =
             new SampleFileMetadata("/data/msg_props_old.bin", 64);
     public static final SampleFileMetadata MSG_PROPS =

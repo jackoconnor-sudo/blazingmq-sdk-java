@@ -53,7 +53,7 @@ class ProtocolEventImplTcpReaderTest {
 
     static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private ByteBuffer[] buildPushMessage(boolean isOldStyleProperties) throws IOException {
+    private ByteBuffer[] buildPushMessage() throws IOException {
         String PAYLOAD = "abcdefghijklmnopqrstuvwxyz";
         String GUID = "ABCDEF0123456789ABCDEF0123456789";
 
@@ -65,7 +65,7 @@ class ProtocolEventImplTcpReaderTest {
         pushMsg.appData().setPayload(ByteBuffer.wrap(PAYLOAD.getBytes()));
 
         PushEventBuilder builder = new PushEventBuilder();
-        builder.packMessage(pushMsg, isOldStyleProperties);
+        builder.packMessage(pushMsg);
 
         return builder.build();
     }
@@ -206,9 +206,9 @@ class ProtocolEventImplTcpReaderTest {
 
         final int NUM_MESSAGES = 3;
 
-        for (boolean isOldStyleProperties : new boolean[] {true, false}) {
+        {
             // 1. Generate BlazingMQ EventImpl with several PUSH messages;
-            ByteBuffer[] event = buildPushMessage(isOldStyleProperties);
+            ByteBuffer[] event = buildPushMessage();
             ByteBufferInputStream inpStream = new ByteBufferInputStream(event);
             ReadCompletionStatus status = new ReadCompletionStatus();
 

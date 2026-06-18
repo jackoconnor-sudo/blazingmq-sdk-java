@@ -17,7 +17,6 @@ package com.bloomberg.bmq.it;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -609,18 +608,14 @@ class TcpBrokerConnectionIT {
                     BmqBrokerContainer.createContainer(opts.brokerUri().getPort())
                 };
 
-        assertFalse(servers[0].isOldStyleMessageProperties());
-        assertFalse(servers[1].isOldStyleMessageProperties());
-
         for (TestTcpServer server : servers) {
             TestSession session = new TestSession(opts);
 
             // 1) Bring up the server
             // 2) Invoke channel 'start' and ensure that it succeeds.
             // 3) Wait for start status callback
-            // 4) Check that the "broker" supports new style message properties
-            // 5) Linger client session.
-            // 6) Stop the server.
+            // 4) Linger client session.
+            // 5) Stop the server.
 
             logger.info("Start the server.");
             server.start();
@@ -638,16 +633,6 @@ class TcpBrokerConnectionIT {
                 // 3) Wait for start status callback.
                 assertEquals(StartStatus.SUCCESS, session.startStatus(timeout));
                 assertEquals(SessionStatus.SESSION_UP, session.sessionStatus());
-
-                // 4) Check the connection for broker response
-                logger.info(
-                        "Server: {}, old style properties: {}",
-                        server,
-                        server.isOldStyleMessageProperties());
-
-                assertEquals(
-                        server.isOldStyleMessageProperties(),
-                        session.channel.isOldStyleMessageProperties());
 
                 if (server instanceof BmqBroker) {
                     ((BmqBroker) server).setDropTmpFolder();
@@ -1212,10 +1197,7 @@ class TcpBrokerConnectionIT {
 
             header.setLength(
                     EventHeader.HEADER_SIZE
-                            + (PushHeader.HEADER_SIZE_FOR_SCHEMA_ID
-                                            + unpackedSize
-                                            + numPaddingBytes)
-                                    * N);
+                            + (PushHeader.HEADER_SIZE + unpackedSize + numPaddingBytes) * N);
 
             header.streamOut(bbos);
 
@@ -1226,7 +1208,6 @@ class TcpBrokerConnectionIT {
                 pushMsg.appData().setPayload(ByteBuffer.wrap(bytes));
 
                 pushMsg.appData().setProperties(props);
-                pushMsg.appData().setIsOldStyleProperties(server.isOldStyleMessageProperties());
 
                 pushMsg.compressData();
 
