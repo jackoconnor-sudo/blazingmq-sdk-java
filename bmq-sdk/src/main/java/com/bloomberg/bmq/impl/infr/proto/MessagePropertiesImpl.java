@@ -231,7 +231,7 @@ public class MessagePropertiesImpl implements MessageProperties {
         }
 
         // Add padding bytes
-        totalLength += numPaddingBytes;
+        totalLength += (int) numPaddingBytes;
 
         if (totalLength != propsAreaSize) {
             throw new IOException(
