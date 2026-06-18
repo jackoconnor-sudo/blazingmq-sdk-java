@@ -30,10 +30,10 @@ class SystemUtilTest {
     @Test
     void testJavaVersions() {
         assertTrue(
-                SystemUtil.JavaVersion.JAVA_UNSUPPORTED.compareTo(SystemUtil.JavaVersion.JAVA_8)
+                SystemUtil.JavaVersion.JAVA_UNSUPPORTED.compareTo(SystemUtil.JavaVersion.JAVA_11)
                         < 0);
-        assertTrue(SystemUtil.JavaVersion.JAVA_8.compareTo(SystemUtil.JavaVersion.JAVA_11) < 0);
         assertTrue(SystemUtil.JavaVersion.JAVA_11.compareTo(SystemUtil.JavaVersion.JAVA_17) < 0);
+        assertTrue(SystemUtil.JavaVersion.JAVA_17.compareTo(SystemUtil.JavaVersion.JAVA_21) < 0);
     }
 
     @Test

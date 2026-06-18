@@ -147,9 +147,8 @@ public class TestTools {
             bb.put(b);
         }
 
-        // 'flip()' might return 'Buffer' interface objects in some JDKs,
-        // need to specify concrete class
-        return (ByteBuffer) bb.flip();
+        bb.flip();
+        return bb;
     }
 
     public static PutMessageImpl preparePutMessage(String payload, boolean isOldStyleProperties)
