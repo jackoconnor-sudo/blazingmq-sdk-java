@@ -36,18 +36,18 @@ class PutEventImplBuilderTest {
 
     @Test
     void testErrorPutMessage() throws IOException {
-        for (boolean isOldStyleProperties : new boolean[] {false, true}) {
+        {
             PutMessageImpl putMsg = new PutMessageImpl();
             PutEventBuilder builder = new PutEventBuilder();
 
-            EventBuilderResult res = builder.packMessage(putMsg, isOldStyleProperties);
+            EventBuilderResult res = builder.packMessage(putMsg);
             assertEquals(EventBuilderResult.PAYLOAD_EMPTY, res);
 
             putMsg = new PutMessageImpl();
             ByteBuffer buffer = ByteBuffer.allocate(0);
             putMsg.appData().setPayload(buffer);
 
-            res = builder.packMessage(putMsg, isOldStyleProperties);
+            res = builder.packMessage(putMsg);
             assertEquals(EventBuilderResult.PAYLOAD_EMPTY, res);
 
             putMsg = new PutMessageImpl();
@@ -57,7 +57,7 @@ class PutEventImplBuilderTest {
             // set compression to none in order to get PAYLOAD_TOO_BIG result
             putMsg.setCompressionType(CompressionAlgorithmType.E_NONE);
 
-            res = builder.packMessage(putMsg, isOldStyleProperties);
+            res = builder.packMessage(putMsg);
             assertEquals(EventBuilderResult.PAYLOAD_TOO_BIG, res);
 
             putMsg = new PutMessageImpl();
@@ -73,12 +73,12 @@ class PutEventImplBuilderTest {
             putMsg.setCompressionType(CompressionAlgorithmType.E_NONE);
 
             for (int i = 0; i < numMsgs; i++) {
-                res = builder.packMessage(putMsg, isOldStyleProperties);
+                res = builder.packMessage(putMsg);
                 assertEquals(EventBuilderResult.SUCCESS, res);
             }
 
             // Try to add one more message, which must fail with event_too_big.
-            res = builder.packMessage(putMsg, isOldStyleProperties);
+            res = builder.packMessage(putMsg);
             assertEquals(EventBuilderResult.EVENT_TOO_BIG, res);
 
             putMsg = new PutMessageImpl();
@@ -90,7 +90,7 @@ class PutEventImplBuilderTest {
             assertNull(corId);
 
             // Try to pack with default CorrelationID which is zero
-            res = builder.packMessage(putMsg, isOldStyleProperties);
+            res = builder.packMessage(putMsg);
             assertEquals(EventBuilderResult.MISSING_CORRELATION_ID, res);
         }
     }
@@ -99,7 +99,7 @@ class PutEventImplBuilderTest {
     void testBigPutEvent() throws IOException {
         // Check that ByteBuffer limit is honored when Put event is being built
 
-        for (boolean isOldStyleProperties : new boolean[] {false, true}) {
+        {
             PutMessageImpl putMsg = new PutMessageImpl();
             PutEventBuilder builder = new PutEventBuilder();
 
@@ -112,7 +112,7 @@ class PutEventImplBuilderTest {
             // PutHeader.MAX_PAYLOAD_SIZE_SOFT.
             putMsg.setCompressionType(CompressionAlgorithmType.E_NONE);
 
-            EventBuilderResult res = builder.packMessage(putMsg, isOldStyleProperties);
+            EventBuilderResult res = builder.packMessage(putMsg);
             assertEquals(EventBuilderResult.SUCCESS, res);
 
             ByteBuffer[] message;
@@ -159,19 +159,16 @@ class PutEventImplBuilderTest {
             // set compression to none in order to match file content
             putMsg.setCompressionType(CompressionAlgorithmType.E_NONE);
 
-            final boolean isOldStyleProperties = i % 2 == 0;
             assertEquals(
-                    EventBuilderResult.SUCCESS, builder.packMessage(putMsg, isOldStyleProperties));
+                    EventBuilderResult.SUCCESS, builder.packMessage(putMsg));
 
             // Compare with value stored in the binary pattern
             logger.info("PUT header {}: {}", i + 1, putMsg.header());
-            assertEquals(crc32s[i], putMsg.crc32c());
-            assertEquals(i, putMsg.header().schemaWireId());
-            assertEquals(isOldStyleProperties, putMsg.appData().isOldStyleProperties());
+            assertEquals(1, putMsg.header().schemaWireId());
         }
 
         ByteBuffer[] message = builder.build();
 
-        TestHelpers.compareWithFileContent(message, MessagesTestSamples.PUT_MULTI_MSG);
+        TestHelpers.compareWithFileContent(message, MessagesTestSamples.PUT_MULTI_MSG_NEW);
     }
 }

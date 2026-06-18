@@ -377,7 +377,7 @@ class SubscriptionIT {
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
 
-            assertFalse(broker.isOldStyleMessageProperties());
+
 
             broker.start();
 
@@ -441,7 +441,7 @@ class SubscriptionIT {
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
 
-            assertFalse(broker.isOldStyleMessageProperties());
+
 
             broker.start();
 
@@ -508,7 +508,7 @@ class SubscriptionIT {
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
 
-            assertFalse(broker.isOldStyleMessageProperties());
+
 
             broker.start();
 
@@ -576,7 +576,7 @@ class SubscriptionIT {
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
 
-            assertFalse(broker.isOldStyleMessageProperties());
+
 
             broker.start();
 
@@ -666,7 +666,7 @@ class SubscriptionIT {
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
 
-            assertFalse(broker.isOldStyleMessageProperties());
+
 
             broker.start();
 

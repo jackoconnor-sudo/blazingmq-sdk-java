@@ -55,10 +55,7 @@ public class NettyProducerIT {
     }
 
     public static void sendMessage(
-            String[] msgPayloads,
-            SessionOptions sesOpts,
-            Uri queueUri,
-            boolean isOldStyleProperties) {
+            String[] msgPayloads, SessionOptions sesOpts, Uri queueUri) {
         Argument.expectNonNull(sesOpts, "sesOpts");
 
         final Duration TEST_REQUEST_TIMEOUT = Duration.ofSeconds(45);
@@ -95,8 +92,7 @@ public class NettyProducerIT {
             logger.info("Queue opened");
 
             for (String msgPayload : msgPayloads) {
-                PutMessageImpl message =
-                        TestTools.preparePutMessage(msgPayload, isOldStyleProperties);
+                PutMessageImpl message = TestTools.preparePutMessage(msgPayload);
                 session.post(qh, message);
             }
 
@@ -126,11 +122,7 @@ public class NettyProducerIT {
             final String MSG = "I'm Netty producer!";
             final Uri QUEUE_URI = BmqBroker.Domains.Priority.generateQueueUri();
 
-            sendMessage(
-                    new String[] {MSG},
-                    broker.sessionOptions(),
-                    QUEUE_URI,
-                    broker.isOldStyleMessageProperties());
+            sendMessage(new String[] {MSG}, broker.sessionOptions(), QUEUE_URI);
 
             broker.setDropTmpFolder();
         }

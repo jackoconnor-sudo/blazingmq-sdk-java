@@ -144,18 +144,13 @@ public class PushHeader {
     // Minimum size (bytes) of a 'PushHeader' (that is sufficient to
     // capture header words).  This value should *never* change.
 
-    public static final int HEADER_SIZE = 28;
+    public static final int HEADER_SIZE = 32;
     // Current size (bytes) of the header.
-    // TODO: set to 32 after 2nd release of "new style" brokers
-
-    public static final int HEADER_SIZE_FOR_SCHEMA_ID = 32;
-    // Current size (bytes) of the header with schema id
-    // TODO: remove after 2nd release of "new style" brokers
 
     public PushHeader() {
         messageGUID = new byte[MessageGUID.SIZE_BINARY];
-        setMessageWords((byte) (HEADER_SIZE_FOR_SCHEMA_ID / Protocol.WORD_SIZE));
-        setHeaderWords((byte) (HEADER_SIZE_FOR_SCHEMA_ID / Protocol.WORD_SIZE));
+        setMessageWords((byte) (HEADER_SIZE / Protocol.WORD_SIZE));
+        setHeaderWords((byte) (HEADER_SIZE / Protocol.WORD_SIZE));
     }
 
     public void setMessageWords(int value) {
@@ -231,12 +226,15 @@ public class PushHeader {
         return schemaWireId;
     }
 
+    public static final int HEADER_SIZE_OLD = 28;
+    // Size (bytes) of the header without the SchemaWireId field.
+
     public void streamIn(ByteBufferInputStream bbis) throws IOException {
         flagsAndMessageWords = bbis.readInt();
         optionsWordsAndHeaderWords = bbis.readInt();
 
         final int headerSize = headerWords() * Protocol.WORD_SIZE;
-        if (headerSize < HEADER_SIZE) {
+        if (headerSize < HEADER_SIZE_OLD) {
             throw new IOException("Invalid size: " + headerSize);
         }
 
@@ -245,30 +243,23 @@ public class PushHeader {
             messageGUID[i] = bbis.readByte();
         }
 
-        int numRead = HEADER_SIZE;
-
-        // Check if it's new header with schema id
-        schemaWireId = 0;
-        // TODO: update after 2nd release of "new style" brokers
-        if (headerSize >= HEADER_SIZE_FOR_SCHEMA_ID) {
+        if (headerSize >= HEADER_SIZE) {
             schemaWireId = bbis.readShort();
             reserved = bbis.readShort();
-            numRead += 4;
         }
 
-        if (numRead < headerSize) {
-            // Skip bytes that we don't know or ignore in the header.
-            final int numExtraBytes = headerSize - numRead;
-
-            if (bbis.skip(numExtraBytes) != numExtraBytes) {
-                throw new IOException("Failed to skip " + numExtraBytes + " bytes.");
+        final int bytesRead = headerSize >= HEADER_SIZE ? HEADER_SIZE : HEADER_SIZE_OLD;
+        if (headerSize > bytesRead) {
+            final int toSkip = headerSize - bytesRead;
+            if (bbis.skip(toSkip) != toSkip) {
+                throw new IOException("Failed to skip " + toSkip + " bytes.");
             }
         }
     }
 
     public void streamOut(ByteBufferOutputStream bbos) throws IOException {
         final int headerSize = headerWords() * Protocol.WORD_SIZE;
-        if (headerSize != HEADER_SIZE_FOR_SCHEMA_ID) {
+        if (headerSize != HEADER_SIZE) {
             throw new IOException("Invalid size: " + headerSize);
         }
 

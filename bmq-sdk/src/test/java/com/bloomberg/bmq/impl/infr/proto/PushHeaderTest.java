@@ -58,7 +58,7 @@ class PushHeaderTest {
 
     @Test
     void testStreamIn() throws IOException {
-        ByteBuffer buf = TestHelpers.readFile(MessagesTestSamples.PUSH_MULTI_MSG.filePath());
+        ByteBuffer buf = TestHelpers.readFile(MessagesTestSamples.PUSH_MULTI_MSG_NEW.filePath());
 
         ByteBufferInputStream bbis = new ByteBufferInputStream(buf);
         EventHeader header = new EventHeader();
@@ -67,7 +67,6 @@ class PushHeaderTest {
         header.streamIn(bbis);
 
         assertEquals(0, header.fragmentBit());
-        assertEquals(256, header.length());
         assertEquals(length, header.length());
         assertEquals(1, header.protocolVersion());
         assertEquals(2, header.headerWords());
@@ -80,12 +79,11 @@ class PushHeaderTest {
             logger.info("PUSH header {}: {}", i + 1, pushHeader);
 
             assertEquals(2, pushHeader.flags());
-            assertEquals(31, pushHeader.messageWords());
             assertEquals(0, pushHeader.optionsWords());
             assertEquals(0, pushHeader.compressionType());
             assertEquals(8, pushHeader.headerWords());
             assertEquals(9876, pushHeader.queueId());
-            assertEquals(i, pushHeader.schemaWireId());
+            assertEquals(1, pushHeader.schemaWireId());
 
             assertEquals("ABCDEF0123456789ABCDEF0123456789", pushHeader.messageGUID().toString());
 

@@ -2867,7 +2867,7 @@ public class SessionIT {
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
 
-            assertFalse(broker.isOldStyleMessageProperties());
+
 
             broker.start();
 
@@ -3101,7 +3101,7 @@ public class SessionIT {
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
 
-            assertFalse(broker.isOldStyleMessageProperties());
+
 
             broker.start();
 

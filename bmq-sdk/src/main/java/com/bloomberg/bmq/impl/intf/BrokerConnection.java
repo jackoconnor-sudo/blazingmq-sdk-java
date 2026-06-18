@@ -56,7 +56,4 @@ public interface BrokerConnection {
     GenericResult write(ByteBuffer[] buffers, boolean waitUntilWritable);
 
     GenericResult linger();
-
-    // TODO: remove after 2nd release of "new style" brokers
-    boolean isOldStyleMessageProperties();
 }

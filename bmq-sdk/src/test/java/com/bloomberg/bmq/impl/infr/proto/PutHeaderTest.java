@@ -37,7 +37,7 @@ class PutHeaderTest {
 
     @Test
     void testStreamIn() throws IOException {
-        ByteBuffer buf = TestHelpers.readFile(MessagesTestSamples.PUT_MULTI_MSG.filePath());
+        ByteBuffer buf = TestHelpers.readFile(MessagesTestSamples.PUT_MULTI_MSG_NEW.filePath());
 
         ByteBufferInputStream bbis = new ByteBufferInputStream(buf);
         EventHeader header = new EventHeader();
@@ -46,15 +46,11 @@ class PutHeaderTest {
         header.streamIn(bbis);
 
         assertEquals(0, header.fragmentBit());
-        assertEquals(264, header.length());
         assertEquals(length, header.length());
         assertEquals(1, header.protocolVersion());
         assertEquals(2, header.headerWords());
         assertNotNull(header.type());
         assertEquals(EventType.PUT, header.type());
-
-        final long[] crc32s = new long[] {3469549003L, 340340870L};
-        final int[] schemaIds = new int[] {0, 1};
 
         for (int i = 0; i < 2; ++i) {
             PutHeader putHeader = new PutHeader();
@@ -63,7 +59,6 @@ class PutHeaderTest {
             logger.info("PUT header {}: {}", i + 1, putHeader);
 
             assertEquals(3, putHeader.flags());
-            assertEquals(32, putHeader.messageWords());
             assertEquals(0, putHeader.optionsWords());
             assertEquals(0, putHeader.compressionType());
             assertEquals(9, putHeader.headerWords());
@@ -71,8 +66,8 @@ class PutHeaderTest {
 
             CorrelationId corId = CorrelationIdImpl.restoreId(1234);
             assertEquals(corId, putHeader.correlationId());
-            assertEquals(crc32s[i], putHeader.crc32c());
-            assertEquals(schemaIds[i], putHeader.schemaWireId());
+            assertEquals(340340870L, putHeader.crc32c());
+            assertEquals(1, putHeader.schemaWireId());
 
             final int toSkip =
                     (putHeader.messageWords() - putHeader.headerWords()) * Protocol.WORD_SIZE;

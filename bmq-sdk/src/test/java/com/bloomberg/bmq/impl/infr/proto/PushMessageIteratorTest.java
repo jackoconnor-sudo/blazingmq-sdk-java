@@ -100,7 +100,7 @@ class PushMessageIteratorTest {
 
     @Test
     void testWithPattern() throws IOException {
-        ByteBuffer buf = TestHelpers.readFile(MessagesTestSamples.PUSH_MULTI_MSG.filePath());
+        ByteBuffer buf = TestHelpers.readFile(MessagesTestSamples.PUSH_MULTI_MSG_NEW.filePath());
 
         PushEventImpl pushEvent = new PushEventImpl(new ByteBuffer[] {buf});
         assertTrue(pushEvent.isValid());
@@ -126,14 +126,8 @@ class PushMessageIteratorTest {
         int i = 0;
         while (pushIt.hasNext()) {
             // Build expected content
-            final boolean isOldStyleProperties = i % 2 == 0;
-
             final ByteBufferOutputStream bbos = new ByteBufferOutputStream();
-            if (isOldStyleProperties) {
-                props.streamOutOld(bbos);
-            } else {
-                props.streamOut(bbos);
-            }
+            props.streamOut(bbos);
 
             bbos.writeAscii(PAYLOAD);
 
@@ -155,8 +149,7 @@ class PushMessageIteratorTest {
             assertEquals(GUID, pushMsg.messageGUID().toHex());
             assertEquals(QUEUE_ID, pushMsg.queueId());
             assertEquals(FLAGS, pushMsg.flags());
-            assertEquals(isOldStyleProperties ? 0 : 1, pushMsg.header().schemaWireId());
-            assertEquals(isOldStyleProperties, pushMsg.appData().isOldStyleProperties());
+            assertEquals(1, pushMsg.header().schemaWireId());
             assertArrayEquals(new Integer[] {0}, pushMsg.subQueueIds());
 
             ByteBuffer[] data = pushMsg.appData().applicationData();
@@ -200,8 +193,6 @@ class PushMessageIteratorTest {
         final PushMessageImpl[] pushs = new PushMessageImpl[NUM_MSGS];
 
         for (int i = 0; i < NUM_MSGS; i++) {
-            final boolean isOldStyleProperties = i % 2 == 0;
-
             PushMessageImpl msg = new PushMessageImpl();
             msg.setFlags(FLAGS);
             msg.setQueueId(i);
@@ -209,10 +200,9 @@ class PushMessageIteratorTest {
             msg.appData().setProperties(props);
             msg.appData().setPayload(payload);
 
-            EventBuilderResult rc = builder.packMessage(msg, isOldStyleProperties);
+            EventBuilderResult rc = builder.packMessage(msg);
             assertEquals(EventBuilderResult.SUCCESS, rc);
-            assertEquals(isOldStyleProperties, msg.appData().isOldStyleProperties());
-            assertEquals(isOldStyleProperties ? 0 : 1, msg.header().schemaWireId());
+            assertEquals(1, msg.header().schemaWireId());
 
             pushs[i] = msg;
         }
@@ -233,8 +223,7 @@ class PushMessageIteratorTest {
                 assertEquals(GUID, msg.messageGUID());
                 assertEquals(i, msg.queueId());
                 assertEquals(FLAGS, msg.flags());
-                assertEquals(i % 2, msg.header().schemaWireId());
-                assertEquals(i % 2 == 0, msg.appData().isOldStyleProperties());
+                assertEquals(1, msg.header().schemaWireId());
                 assertEquals(exp.appData().numPaddingBytes(), msg.appData().numPaddingBytes());
                 assertArrayEquals(exp.appData().applicationData(), msg.appData().applicationData());
 
@@ -285,7 +274,7 @@ class PushMessageIteratorTest {
         // 4. Advance the first iterator one more time
         // 5. Now advance it again and verify a exception is thrown
 
-        ByteBuffer buf = TestHelpers.readFile(MessagesTestSamples.PUSH_MULTI_MSG.filePath());
+        ByteBuffer buf = TestHelpers.readFile(MessagesTestSamples.PUSH_MULTI_MSG_NEW.filePath());
 
         PushEventImpl pushEvent = new PushEventImpl(new ByteBuffer[] {buf});
 
@@ -312,8 +301,6 @@ class PushMessageIteratorTest {
         final int NUM = 500;
 
         for (int i = 0; i < NUM; i++) {
-            final boolean isOldStyleProperties = i % 2 == 0;
-
             PushMessageImpl pushMsg = new PushMessageImpl();
 
             pushMsg.appData().setPayload(ByteBuffer.wrap(bytes));
@@ -326,7 +313,7 @@ class PushMessageIteratorTest {
 
             pushMsg.setCompressionType(CompressionAlgorithmType.E_ZLIB);
 
-            builder.packMessage(pushMsg, isOldStyleProperties);
+            builder.packMessage(pushMsg);
         }
 
         PushEventImpl pushEvent = new PushEventImpl(builder.build());
@@ -364,7 +351,7 @@ class PushMessageIteratorTest {
 
     @Test
     void testUnknownCompression() throws IOException {
-        for (boolean isOldStyleProperties : new boolean[] {true, false}) {
+        {
             final byte[] bytes = new byte[Protocol.COMPRESSION_MIN_APPDATA_SIZE + 1];
 
             bytes[0] = 1;
@@ -393,10 +380,7 @@ class PushMessageIteratorTest {
 
             header.setLength(
                     EventHeader.HEADER_SIZE
-                            + (PushHeader.HEADER_SIZE_FOR_SCHEMA_ID
-                                            + unpackedSize
-                                            + numPaddingBytes)
-                                    * NUM);
+                            + (PushHeader.HEADER_SIZE + unpackedSize + numPaddingBytes) * NUM);
 
             header.streamOut(bbos);
 
@@ -406,7 +390,6 @@ class PushMessageIteratorTest {
                 pushMsg.appData().setPayload(ByteBuffer.wrap(bytes));
 
                 pushMsg.appData().setProperties(props);
-                pushMsg.appData().setIsOldStyleProperties(isOldStyleProperties);
 
                 pushMsg.compressData();
 

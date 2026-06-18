@@ -98,7 +98,6 @@ public class MessagePropertyHeader {
                                 | (value << PROP_TYPE_START_IDX));
     }
 
-    // TODO: rename to offset after 2nd rollout of "new style" brokers
     public void setPropertyValueLength(int value) {
         Argument.expectNonNegative(value, "value");
         Argument.expectNotGreater(value, MAX_PROPERTY_VALUE_LENGTH, "value");
@@ -126,7 +125,6 @@ public class MessagePropertyHeader {
         return result >>> PROP_TYPE_START_IDX;
     }
 
-    // TODO: rename to offset after 2nd rollout of "new style" brokers
     public int propertyValueLength() {
         int result =
                 (propTypeAndPropValueLenUpper & PROP_VALUE_LEN_UPPER_MASK)

@@ -161,9 +161,8 @@ class PutPosterTest {
 
     @Test
     void testPostValidMessages() throws IOException {
-        for (boolean isOldStyleProperties : new boolean[] {false, true}) {
+        {
             BrokerConnection mockedConnection = mock(BrokerConnection.class);
-            when(mockedConnection.isOldStyleMessageProperties()).thenReturn(isOldStyleProperties);
             when(mockedConnection.write(any(ByteBuffer[].class), anyBoolean()))
                     .thenReturn(GenericResult.SUCCESS);
 
@@ -199,31 +198,25 @@ class PutPosterTest {
 
             poster.post(bigMsg1, smallMsg1, bigMsg2, smallMsg2, compressedMsg);
 
-            assertEquals(isOldStyleProperties, bigMsg1.appData().isOldStyleProperties());
-            assertEquals(isOldStyleProperties, smallMsg1.appData().isOldStyleProperties());
-            assertEquals(isOldStyleProperties, bigMsg2.appData().isOldStyleProperties());
-            assertEquals(isOldStyleProperties, smallMsg2.appData().isOldStyleProperties());
-            assertEquals(isOldStyleProperties, compressedMsg.appData().isOldStyleProperties());
-
             assertEquals(0, bigMsg1.header().schemaWireId());
-            assertEquals(isOldStyleProperties ? 0 : 1, smallMsg1.header().schemaWireId());
+            assertEquals(1, smallMsg1.header().schemaWireId());
             assertEquals(0, bigMsg2.header().schemaWireId());
-            assertEquals(isOldStyleProperties ? 0 : 1, smallMsg2.header().schemaWireId());
-            assertEquals(isOldStyleProperties ? 0 : 1, compressedMsg.header().schemaWireId());
+            assertEquals(1, smallMsg2.header().schemaWireId());
+            assertEquals(1, compressedMsg.header().schemaWireId());
 
             // Build data to check
             PutEventBuilder builder = new PutEventBuilder();
             EventsStats expectedStats = new EventsStats();
 
-            builder.packMessage(bigMsg1, isOldStyleProperties);
-            builder.packMessage(smallMsg1, isOldStyleProperties);
+            builder.packMessage(bigMsg1);
+            builder.packMessage(smallMsg1);
             expectedStats.onEvent(EventType.PUT, builder.eventLength(), builder.messageCount());
             ByteBuffer[] data1 = builder.build();
 
             builder.reset();
-            builder.packMessage(bigMsg2, isOldStyleProperties);
-            builder.packMessage(smallMsg2, isOldStyleProperties);
-            builder.packMessage(compressedMsg, isOldStyleProperties);
+            builder.packMessage(bigMsg2);
+            builder.packMessage(smallMsg2);
+            builder.packMessage(compressedMsg);
             expectedStats.onEvent(EventType.PUT, builder.eventLength(), builder.messageCount());
             ByteBuffer[] data2 = builder.build();
 
@@ -269,9 +262,8 @@ class PutPosterTest {
     @Test
     void testPostNoInfiniteLoop() throws IOException, TimeoutException, InterruptedException {
 
-        for (boolean isOldStyleProperties : new boolean[] {false, true}) {
+        {
             BrokerConnection connection = mock(BrokerConnection.class);
-            when(connection.isOldStyleMessageProperties()).thenReturn(isOldStyleProperties);
             when(connection.write(any(ByteBuffer[].class), anyBoolean()))
                     .thenReturn(GenericResult.SUCCESS);
 
@@ -313,9 +305,8 @@ class PutPosterTest {
 
     @Test
     void testRegisterAck() throws Exception {
-        for (boolean isOldStyleProperties : new boolean[] {false, true}) {
+        {
             BrokerConnection connection = mock(BrokerConnection.class);
-            when(connection.isOldStyleMessageProperties()).thenReturn(isOldStyleProperties);
             when(connection.write(any(ByteBuffer[].class), anyBoolean()))
                     .thenReturn(GenericResult.SUCCESS);
 

@@ -40,13 +40,11 @@ public class ApplicationDataBenchmark {
         test.verifyStreamIn(
                 test.generatePayload(PAYLOAD_SIZE_BYTES),
                 test.generateProps(),
-                false,
                 compressionType);
 
         test.verifyStreamOut(
                 test.generatePayload(PAYLOAD_SIZE_BYTES),
                 test.generateProps(),
-                false,
                 compressionType);
     }
 }
