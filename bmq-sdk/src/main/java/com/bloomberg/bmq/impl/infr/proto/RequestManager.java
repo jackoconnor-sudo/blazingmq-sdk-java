@@ -15,6 +15,7 @@
  */
 package com.bloomberg.bmq.impl.infr.proto;
 
+import com.bloomberg.bmq.ProtocolException;
 import com.bloomberg.bmq.ResultCodes.GenericResult;
 import com.bloomberg.bmq.impl.infr.msg.ControlMessageChoice;
 import com.bloomberg.bmq.impl.infr.msg.StatusCategory;
@@ -182,7 +183,7 @@ public class RequestManager {
                 Thread.currentThread().interrupt();
             } catch (Exception ex) { // CanceledException, ExecutionException
                 logger.error("Exception: ", ex);
-                throw new RuntimeException(
+                throw new ProtocolException(
                         "Runtime exception while expecting for response future.");
             }
         }
@@ -304,7 +305,7 @@ public class RequestManager {
             schemaEventBuilder.setMessage(request);
         } catch (IOException ex) {
             // Should never happen - program error
-            throw new RuntimeException(ex);
+            throw new ProtocolException("Failed to build request message", ex);
         }
         req.setTimeout(timeoutInterval);
         req.start();

@@ -913,7 +913,7 @@ public final class Session implements AbstractSession {
         public void handleQueueEvent(QueueControlEvent ev) {
             QueueHandle queue = ev.getQueue();
             if (queue == null)
-                throw new RuntimeException("Failure: Queue is null. Ev: " + ev.toString());
+                throw new QueueOperationException("Failure: Queue is null. Ev: " + ev.toString());
             queue.handleQueueEvent(ev);
         }
 

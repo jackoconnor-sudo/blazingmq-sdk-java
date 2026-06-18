@@ -108,7 +108,7 @@ public class ResultCodes {
                         break;
                 }
             }
-            throw new RuntimeException("Failure of return code upcast");
+            throw new QueueOperationException("Failure of return code upcast");
         }
     }
 
@@ -175,7 +175,7 @@ public class ResultCodes {
                         break;
                 }
             }
-            throw new RuntimeException("Failure of return code up cast");
+            throw new QueueOperationException("Failure of return code up cast");
         }
     }
 
@@ -241,7 +241,7 @@ public class ResultCodes {
                         break;
                 }
             }
-            throw new RuntimeException("Failure of return code upcast");
+            throw new QueueOperationException("Failure of return code upcast");
         }
     }
 

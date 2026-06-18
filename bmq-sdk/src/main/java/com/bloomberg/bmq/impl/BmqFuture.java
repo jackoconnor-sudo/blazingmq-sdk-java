@@ -15,6 +15,7 @@
  */
 package com.bloomberg.bmq.impl;
 
+import com.bloomberg.bmq.BrokerConnectionException;
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -45,9 +46,9 @@ public class BmqFuture<RESULT> {
             return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new BrokerConnectionException("Interrupted", e);
         } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new BrokerConnectionException("Execution failed", e);
         }
     }
 }

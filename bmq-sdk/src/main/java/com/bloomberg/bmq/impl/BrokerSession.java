@@ -16,6 +16,7 @@
 package com.bloomberg.bmq.impl;
 
 import com.bloomberg.bmq.BMQException;
+import com.bloomberg.bmq.BrokerConnectionException;
 import com.bloomberg.bmq.HostHealthMonitor;
 import com.bloomberg.bmq.HostHealthState;
 import com.bloomberg.bmq.QueueOptions;
@@ -200,7 +201,7 @@ public final class BrokerSession
                 pool.shutdownNow(); // Cancel currently executing tasks
                 // Wait a while for tasks to respond to being cancelled
                 if (!pool.awaitTermination(TERMINATION_TIMEOUT, TimeUnit.SECONDS))
-                    throw new RuntimeException("Pool did not terminate");
+                    throw new BrokerConnectionException("Pool did not terminate");
             }
         } catch (InterruptedException ie) {
             // (Re-)Cancel if current thread also interrupted
@@ -334,7 +335,7 @@ public final class BrokerSession
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             // Not recoverable
-            throw new RuntimeException(ex);
+            throw new BrokerConnectionException("Interrupted during broker connection start", ex);
         } finally {
             isStarting.set(false);
         }
@@ -437,10 +438,11 @@ public final class BrokerSession
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             // Not recoverable
-            throw new RuntimeException(ex);
+            throw new BrokerConnectionException("Interrupted during broker connection stop", ex);
         } catch (ExecutionException ex) {
             // Not recoverable
-            throw new RuntimeException(ex);
+            throw new BrokerConnectionException(
+                    "Execution failed during broker connection stop", ex);
         } finally {
             isStopping.set(false);
         }
@@ -720,7 +722,7 @@ public final class BrokerSession
                 lateResponseHandler.handleLateResponse(controlEvent.controlChoice());
             }
         } catch (JsonSyntaxException exception) {
-            throw new RuntimeException(exception);
+            throw new BrokerConnectionException("Failed to process control event", exception);
         }
     }
 
@@ -774,7 +776,7 @@ public final class BrokerSession
             inboundEventBuffer.put(event);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted", e);
+            throw new BrokerConnectionException("Interrupted", e);
         }
     }
 
