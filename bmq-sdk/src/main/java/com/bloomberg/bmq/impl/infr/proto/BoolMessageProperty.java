@@ -21,6 +21,7 @@ public class BoolMessageProperty extends MessageProperty {
         super(PropertyType.BOOL, Byte.SIZE);
     }
 
+    @SuppressWarnings("this-escape")
     public BoolMessageProperty(boolean val) {
         this();
         byte[] b = {(byte) (val ? 1 : 0)};

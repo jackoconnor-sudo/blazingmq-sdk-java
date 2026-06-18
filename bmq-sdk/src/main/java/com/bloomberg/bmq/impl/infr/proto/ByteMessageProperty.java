@@ -21,6 +21,7 @@ public class ByteMessageProperty extends MessageProperty {
         super(PropertyType.BYTE, Byte.SIZE);
     }
 
+    @SuppressWarnings("this-escape")
     public ByteMessageProperty(byte val) {
         this();
         byte[] b = {val};

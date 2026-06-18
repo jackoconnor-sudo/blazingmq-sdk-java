@@ -23,6 +23,7 @@ public class Int32MessageProperty extends MessageProperty {
         super(PropertyType.INT32, Integer.SIZE);
     }
 
+    @SuppressWarnings("this-escape")
     public Int32MessageProperty(int val) {
         this();
         ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
