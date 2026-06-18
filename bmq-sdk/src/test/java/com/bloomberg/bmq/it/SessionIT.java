@@ -2867,8 +2867,6 @@ public class SessionIT {
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
 
-
-
             broker.start();
 
             TestSession session = new TestSession(broker.sessionOptions());
@@ -3100,8 +3098,6 @@ public class SessionIT {
 
         try (BmqBroker broker = BmqBroker.createStoppedBroker()) {
             logger.info("Step 1: Bring up the broker");
-
-
 
             broker.start();
 

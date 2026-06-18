@@ -17,7 +17,6 @@ package com.bloomberg.bmq.it;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -608,8 +607,6 @@ class TcpBrokerConnectionIT {
                     new BmqBrokerSimulator(opts.brokerUri().getPort(), Mode.BMQ_AUTO_MODE),
                     BmqBrokerContainer.createContainer(opts.brokerUri().getPort())
                 };
-
-
 
         for (TestTcpServer server : servers) {
             TestSession session = new TestSession(opts);

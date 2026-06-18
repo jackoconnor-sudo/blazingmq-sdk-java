@@ -54,8 +54,7 @@ public class NettyProducerIT {
         return new QueueImpl(session, uri, flags, null, null, null);
     }
 
-    public static void sendMessage(
-            String[] msgPayloads, SessionOptions sesOpts, Uri queueUri) {
+    public static void sendMessage(String[] msgPayloads, SessionOptions sesOpts, Uri queueUri) {
         Argument.expectNonNull(sesOpts, "sesOpts");
 
         final Duration TEST_REQUEST_TIMEOUT = Duration.ofSeconds(45);

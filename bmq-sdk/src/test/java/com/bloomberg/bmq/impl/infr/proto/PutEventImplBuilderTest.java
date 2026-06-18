@@ -159,8 +159,7 @@ class PutEventImplBuilderTest {
             // set compression to none in order to match file content
             putMsg.setCompressionType(CompressionAlgorithmType.E_NONE);
 
-            assertEquals(
-                    EventBuilderResult.SUCCESS, builder.packMessage(putMsg));
+            assertEquals(EventBuilderResult.SUCCESS, builder.packMessage(putMsg));
 
             // Compare with value stored in the binary pattern
             logger.info("PUT header {}: {}", i + 1, putMsg.header());

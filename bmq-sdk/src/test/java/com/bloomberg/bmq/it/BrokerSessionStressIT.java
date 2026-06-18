@@ -101,8 +101,7 @@ class BrokerSessionStressIT {
                     reader.getState() == QueueState.e_OPENED, "'reader' must be OPENED");
         }
 
-        public void transfer(
-                int payloadSize, int numMsgs, int numPutsPerEvent, boolean waitPush) {
+        public void transfer(int payloadSize, int numMsgs, int numPutsPerEvent, boolean waitPush) {
             if (!putMessages.isEmpty()) {
                 throw new IllegalStateException("'putMessages' expected to be empty");
             }

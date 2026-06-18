@@ -321,8 +321,7 @@ class PushMessageImplTest {
         final boolean hasProperties = props != null && props.numProperties() > 0;
         final boolean hasPayload = getSize(payload) > 0;
 
-        ByteBuffer[] input =
-                generateOutput(duplicate(payload), props, compressionType);
+        ByteBuffer[] input = generateOutput(duplicate(payload), props, compressionType);
         ByteBufferInputStream bbis = new ByteBufferInputStream(duplicate(input));
 
         // Get num of padding bytes
@@ -464,8 +463,7 @@ class PushMessageImplTest {
             assertFalse(PushHeaderFlags.isSet(msg.flags(), PushHeaderFlags.IMPLICIT_PAYLOAD));
         }
 
-        ByteBuffer[] expected =
-                generateOutput(duplicate(payload), props, compressionType);
+        ByteBuffer[] expected = generateOutput(duplicate(payload), props, compressionType);
         ByteBuffer[] streamedData = bbos.reset();
 
         assertArrayEquals(expected, streamedData);

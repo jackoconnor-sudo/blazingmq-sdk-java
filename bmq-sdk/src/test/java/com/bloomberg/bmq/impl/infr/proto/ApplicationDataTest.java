@@ -57,7 +57,6 @@ public class ApplicationDataTest {
 
         assertFalse(appData.hasProperties());
         assertFalse(appData.isCompressed());
-
     }
 
     @Test
@@ -68,8 +67,7 @@ public class ApplicationDataTest {
                     new MessagePropertiesImpl[] {
                         null, new MessagePropertiesImpl(), generateProps()
                     })
-                for (CompressionAlgorithmType compressionType :
-                        CompressionAlgorithmType.values()) {
+                for (CompressionAlgorithmType compressionType : CompressionAlgorithmType.values()) {
                     logger.info(
                             "Stream out with payload:{}, props:{}, compression: {}",
                             payload,
@@ -87,8 +85,7 @@ public class ApplicationDataTest {
                     new MessagePropertiesImpl[] {
                         null, new MessagePropertiesImpl(), generateProps()
                     })
-                for (CompressionAlgorithmType compressionType :
-                        CompressionAlgorithmType.values()) {
+                for (CompressionAlgorithmType compressionType : CompressionAlgorithmType.values()) {
                     logger.info(
                             "Stream in with payload:{}, props:{}, compression: {}",
                             payload,
@@ -235,8 +232,7 @@ public class ApplicationDataTest {
         // Verify unpackedSize
         assertEquals(getSize(payload) + propsSize, appData.unpackedSize());
 
-        ByteBuffer[] expected =
-                generateOutput(duplicate(payload), props, compressionType);
+        ByteBuffer[] expected = generateOutput(duplicate(payload), props, compressionType);
 
         appData.compressData(compressionType);
 
@@ -287,8 +283,7 @@ public class ApplicationDataTest {
             throws IOException {
 
         // Prepare data to stream in
-        ByteBuffer[] data =
-                generateOutput(duplicate(payload), props, compressionType);
+        ByteBuffer[] data = generateOutput(duplicate(payload), props, compressionType);
         ByteBufferInputStream bbis = new ByteBufferInputStream(duplicate(data));
 
         // Get num of padding bytes

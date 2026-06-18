@@ -42,8 +42,7 @@ class MessagePropertiesTest {
         // Test new-style properties with different sample files
         MessagesTestSamples.SampleFileMetadata[] sampleFiles =
                 new MessagesTestSamples.SampleFileMetadata[] {
-                    MessagesTestSamples.MSG_PROPS,
-                    MessagesTestSamples.MSG_PROPS_LONG_HEADERS,
+                    MessagesTestSamples.MSG_PROPS, MessagesTestSamples.MSG_PROPS_LONG_HEADERS,
                 };
 
         for (MessagesTestSamples.SampleFileMetadata sampleFile : sampleFiles) {

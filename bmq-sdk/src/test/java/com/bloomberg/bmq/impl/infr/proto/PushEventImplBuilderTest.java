@@ -109,8 +109,7 @@ class PushEventImplBuilderTest {
             // set compression to none in order to match file content
             pushMsg.setCompressionType(CompressionAlgorithmType.E_NONE);
 
-            assertEquals(
-                    EventBuilderResult.SUCCESS, builder.packMessage(pushMsg));
+            assertEquals(EventBuilderResult.SUCCESS, builder.packMessage(pushMsg));
 
             // Compare with value stored in the binary pattern
             logger.info("PUSH header {}: {}", i + 1, pushMsg.header());
