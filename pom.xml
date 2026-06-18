@@ -74,7 +74,7 @@ limitations under the License. -->
   <properties>
     <rootLocation>${project.basedir}</rootLocation>
     <maven.deploy.skip>true</maven.deploy.skip>
-    <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <git.url />
     <artifactory.central.url />
