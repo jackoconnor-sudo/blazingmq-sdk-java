@@ -281,6 +281,7 @@ limitations under the License. -->
             <compilerArgs>
               <arg>-Xlint:-processing</arg>
               <arg>-Xlint:all</arg>
+              <arg>-Xlint:-this-escape</arg>
             </compilerArgs>
           </configuration>
         </plugin>

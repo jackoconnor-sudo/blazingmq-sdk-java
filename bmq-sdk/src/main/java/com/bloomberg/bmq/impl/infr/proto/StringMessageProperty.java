@@ -28,7 +28,6 @@ public class StringMessageProperty extends MessageProperty {
         super(PropertyType.STRING, MessagePropertyHeader.MAX_PROPERTY_VALUE_LENGTH);
     }
 
-    @SuppressWarnings("this-escape")
     public StringMessageProperty(String val) {
         this();
         setPropertyValue(val.getBytes(StandardCharsets.US_ASCII));

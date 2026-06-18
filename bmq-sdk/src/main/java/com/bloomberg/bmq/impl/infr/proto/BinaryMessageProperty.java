@@ -21,7 +21,6 @@ public class BinaryMessageProperty extends MessageProperty {
         super(PropertyType.BINARY, MessagePropertyHeader.MAX_PROPERTY_VALUE_LENGTH);
     }
 
-    @SuppressWarnings("this-escape")
     public BinaryMessageProperty(byte[] val) {
         this();
         setPropertyValue(val);

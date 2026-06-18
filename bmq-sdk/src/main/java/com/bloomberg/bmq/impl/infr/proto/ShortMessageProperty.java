@@ -23,7 +23,6 @@ public class ShortMessageProperty extends MessageProperty {
         super(PropertyType.SHORT, Short.SIZE);
     }
 
-    @SuppressWarnings("this-escape")
     public ShortMessageProperty(short val) {
         this();
         ByteBuffer buffer = ByteBuffer.allocate(Short.BYTES);
