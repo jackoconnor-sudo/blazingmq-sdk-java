@@ -281,7 +281,6 @@ limitations under the License. -->
             <compilerArgs>
               <arg>-Xlint:-processing</arg>
               <arg>-Xlint:all</arg>
-              <arg>-Xlint:-this-escape</arg>
             </compilerArgs>
           </configuration>
         </plugin>
@@ -553,6 +552,21 @@ limitations under the License. -->
       <properties>
         <maven.compiler.release>11</maven.compiler.release>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <compilerArgs>
+                <arg>-Xlint:-processing</arg>
+                <arg>-Xlint:all</arg>
+                <arg>-Xlint:-this-escape</arg>
+              </compilerArgs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <profile>
