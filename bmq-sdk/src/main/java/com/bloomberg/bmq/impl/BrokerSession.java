@@ -71,6 +71,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -305,16 +306,20 @@ public final class BrokerSession
         // Add host health monitor handler
         addHostHealthMonitorHandler();
 
+        final AtomicReference<BrokerConnection.StartStatus> startStatus =
+                new AtomicReference<>();
         brokerConnection.start(
                 (BrokerConnection.StartStatus status) -> {
                     logger.debug("Start callback: {}", status);
+                    startStatus.set(status);
                     if (status == BrokerConnection.StartStatus.SUCCESS) {
-                        startSema.release();
-
                         // Enabled scheduled stats dumping
                         stats.enableDumping();
+                    } else {
+                        logger.error(
+                                "Broker connection start failed with status: {}", status);
                     }
-                    // TODO: handle error status
+                    startSema.release();
                 });
 
         logger.debug("Broker connection is starting.");
@@ -323,12 +328,22 @@ public final class BrokerSession
                 brokerConnection.stop(
                         (BrokerConnection.StopStatus status) -> {
                             logger.info("Stop callback: {}", status);
-                            // TODO: Here looks like here we need to do the best effort
-                            // and if connection stop fails choose different from TIMEOUT
-                            // return code for BrokerSession.start
+                            if (status != BrokerConnection.StopStatus.SUCCESS) {
+                                logger.error(
+                                        "Failed to stop broker connection during"
+                                                + " start timeout cleanup,"
+                                                + " stop status: {}",
+                                        status);
+                            }
                         },
                         sessionOptions.stopTimeout());
                 return GenericResult.TIMEOUT;
+            }
+            if (startStatus.get() != BrokerConnection.StartStatus.SUCCESS) {
+                logger.error(
+                        "Broker connection start completed with error: {}",
+                        startStatus.get());
+                return GenericResult.UNKNOWN;
             }
             logger.debug("Broker connection started.");
         } catch (InterruptedException ex) {
@@ -411,7 +426,10 @@ public final class BrokerSession
         brokerConnection.stop(
                 (BrokerConnection.StopStatus status) -> {
                     logger.debug("Stop callback: {}", status);
-                    // TODO: handle error status
+                    if (status != BrokerConnection.StopStatus.SUCCESS) {
+                        logger.error(
+                                "Broker connection stop failed with status: {}", status);
+                    }
                     connectionStopFuture.complete(null);
                 },
                 timeout);
@@ -476,7 +494,12 @@ public final class BrokerSession
                                 brokerConnection.stop(
                                         (BrokerConnection.StopStatus status) -> {
                                             logger.info("Stop callback: {}", status);
-                                            // TODO: handle error status
+                                            if (status != BrokerConnection.StopStatus.SUCCESS) {
+                                                logger.error(
+                                                        "Async broker connection stop"
+                                                                + " failed with status: {}",
+                                                        status);
+                                            }
                                             connectionStopFuture.complete(null);
                                         },
                                         stopTimeout),
@@ -1000,7 +1023,10 @@ public final class BrokerSession
     private void checkHostIsStableHealthy() {
         assert isInSessionExecutor();
 
-        // TODO: check that we are not stopping the session
+        if (isStopping.get()) {
+            logger.debug("Session is stopping, skipping host health restored check");
+            return;
+        }
 
         // If there are no more outstanding requests, AND the host remains
         // healthy, then issue a HOST_HEALTH_RESTORED event.
