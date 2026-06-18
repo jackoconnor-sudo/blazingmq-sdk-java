@@ -306,8 +306,7 @@ public final class BrokerSession
         // Add host health monitor handler
         addHostHealthMonitorHandler();
 
-        final AtomicReference<BrokerConnection.StartStatus> startStatus =
-                new AtomicReference<>();
+        final AtomicReference<BrokerConnection.StartStatus> startStatus = new AtomicReference<>();
         brokerConnection.start(
                 (BrokerConnection.StartStatus status) -> {
                     logger.debug("Start callback: {}", status);
@@ -316,8 +315,7 @@ public final class BrokerSession
                         // Enabled scheduled stats dumping
                         stats.enableDumping();
                     } else {
-                        logger.error(
-                                "Broker connection start failed with status: {}", status);
+                        logger.error("Broker connection start failed with status: {}", status);
                     }
                     startSema.release();
                 });
@@ -340,9 +338,7 @@ public final class BrokerSession
                 return GenericResult.TIMEOUT;
             }
             if (startStatus.get() != BrokerConnection.StartStatus.SUCCESS) {
-                logger.error(
-                        "Broker connection start completed with error: {}",
-                        startStatus.get());
+                logger.error("Broker connection start completed with error: {}", startStatus.get());
                 return GenericResult.UNKNOWN;
             }
             logger.debug("Broker connection started.");
@@ -427,8 +423,7 @@ public final class BrokerSession
                 (BrokerConnection.StopStatus status) -> {
                     logger.debug("Stop callback: {}", status);
                     if (status != BrokerConnection.StopStatus.SUCCESS) {
-                        logger.error(
-                                "Broker connection stop failed with status: {}", status);
+                        logger.error("Broker connection stop failed with status: {}", status);
                     }
                     connectionStopFuture.complete(null);
                 },
