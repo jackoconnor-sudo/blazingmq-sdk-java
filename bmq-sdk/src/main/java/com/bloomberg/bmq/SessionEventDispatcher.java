@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles dispatching of broker session events and message events to the appropriate handlers.
  *
- * <p>This class encapsulates the event dispatching logic that translates internal broker events into
- * public session events and routes message events to the correct queue handles.
+ * <p>This class encapsulates the event dispatching logic that translates internal broker events
+ * into public session events and routes message events to the correct queue handles.
  */
 final class SessionEventDispatcher {
 

@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
  * Manages host health state tracking for queue suspend/resume operations.
  *
  * <p>This class tracks the number of pending host health requests and coordinates the transition
- * between healthy and unhealthy states. It is used by queue control strategies to determine when all
- * queues have been suspended or resumed and a corresponding session event should be emitted.
+ * between healthy and unhealthy states. It is used by queue control strategies to determine when
+ * all queues have been suspended or resumed and a corresponding session event should be emitted.
  */
 public final class HealthManagerImpl implements BrokerSession.HealthManager {
 
