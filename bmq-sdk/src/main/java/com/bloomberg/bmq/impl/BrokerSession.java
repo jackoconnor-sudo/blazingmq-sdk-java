@@ -441,7 +441,8 @@ public final class BrokerSession
             throw new BrokerConnectionException("Interrupted during broker connection stop", ex);
         } catch (ExecutionException ex) {
             // Not recoverable
-            throw new BrokerConnectionException("Execution failed during broker connection stop", ex);
+            throw new BrokerConnectionException(
+                    "Execution failed during broker connection stop", ex);
         } finally {
             isStopping.set(false);
         }

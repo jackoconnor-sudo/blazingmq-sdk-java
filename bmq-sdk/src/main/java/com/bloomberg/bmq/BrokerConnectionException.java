@@ -42,7 +42,8 @@ public class BrokerConnectionException extends BMQException {
         super(message, code);
     }
 
-    public BrokerConnectionException(String message, Throwable cause, ResultCodes.GenericCode code) {
+    public BrokerConnectionException(
+            String message, Throwable cause, ResultCodes.GenericCode code) {
         super(message, cause, code);
     }
 }
