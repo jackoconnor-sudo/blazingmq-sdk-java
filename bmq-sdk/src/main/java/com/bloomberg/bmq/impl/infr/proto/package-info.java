@@ -23,8 +23,8 @@
  * com.bloomberg.bmq.impl.infr.proto.AckEventBuilder}, {@link
  * com.bloomberg.bmq.impl.infr.proto.PushEventBuilder}, {@link
  * com.bloomberg.bmq.impl.infr.proto.ConfirmEventBuilder}), message iterators for reading event
- * payloads, header types, message property handling, CRC32-C checksumming, and protocol
- * constants defined in {@link com.bloomberg.bmq.impl.infr.proto.Protocol}.
+ * payloads, header types, message property handling, CRC32-C checksumming, and protocol constants
+ * defined in {@link com.bloomberg.bmq.impl.infr.proto.Protocol}.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */

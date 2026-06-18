@@ -17,9 +17,9 @@
 /**
  * I/O stream utilities for the BlazingMQ Java SDK.
  *
- * <p>This package provides {@link com.bloomberg.bmq.impl.infr.io.ByteBufferInputStream} and
- * {@link com.bloomberg.bmq.impl.infr.io.ByteBufferOutputStream} for reading from and writing to
- * {@link java.nio.ByteBuffer} instances, along with {@link
+ * <p>This package provides {@link com.bloomberg.bmq.impl.infr.io.ByteBufferInputStream} and {@link
+ * com.bloomberg.bmq.impl.infr.io.ByteBufferOutputStream} for reading from and writing to {@link
+ * java.nio.ByteBuffer} instances, along with {@link
  * com.bloomberg.bmq.impl.infr.io.LimitedInputStream} for bounded reads.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.

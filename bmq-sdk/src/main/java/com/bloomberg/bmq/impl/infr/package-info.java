@@ -18,8 +18,8 @@
  * Infrastructure layer for the BlazingMQ Java SDK.
  *
  * <p>This package serves as the root for low-level infrastructure sub-packages that provide
- * networking, protocol encoding/decoding, I/O utilities, message definitions, statistics, and
- * other foundational support used by the SDK implementation.
+ * networking, protocol encoding/decoding, I/O utilities, message definitions, statistics, and other
+ * foundational support used by the SDK implementation.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */

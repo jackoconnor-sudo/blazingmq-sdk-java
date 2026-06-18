@@ -17,8 +17,8 @@
 /**
  * Source control metadata utilities for the BlazingMQ Java SDK.
  *
- * <p>This package provides {@link com.bloomberg.bmq.impl.infr.scm.VersionUtil} for retrieving
- * the SDK version information at runtime.
+ * <p>This package provides {@link com.bloomberg.bmq.impl.infr.scm.VersionUtil} for retrieving the
+ * SDK version information at runtime.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */

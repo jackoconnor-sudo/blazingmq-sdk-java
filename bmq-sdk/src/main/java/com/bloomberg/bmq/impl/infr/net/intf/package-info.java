@@ -20,8 +20,8 @@
  * <p>This package defines the interfaces for the networking layer, including {@link
  * com.bloomberg.bmq.impl.infr.net.intf.TcpConnection} for reading and writing data over a TCP
  * channel, {@link com.bloomberg.bmq.impl.infr.net.intf.TcpConnectionFactory} for creating
- * connections, and {@link com.bloomberg.bmq.impl.infr.net.intf.ChannelStatusHandler} for
- * receiving channel status notifications.
+ * connections, and {@link com.bloomberg.bmq.impl.infr.net.intf.ChannelStatusHandler} for receiving
+ * channel status notifications.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */

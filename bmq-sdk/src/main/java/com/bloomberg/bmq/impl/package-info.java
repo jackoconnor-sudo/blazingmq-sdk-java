@@ -19,11 +19,10 @@
  *
  * <p>This package contains the core implementation classes including {@link
  * com.bloomberg.bmq.impl.BrokerSession} for managing the broker connection lifecycle, {@link
- * com.bloomberg.bmq.impl.QueueImpl} for queue operations, {@link
- * com.bloomberg.bmq.impl.PutPoster} for batching and sending PUT messages, {@link
- * com.bloomberg.bmq.impl.QueueStateManager} for tracking queue states, and {@link
- * com.bloomberg.bmq.impl.InboundEventBuffer} for buffering incoming events with watermark-based
- * flow control.
+ * com.bloomberg.bmq.impl.QueueImpl} for queue operations, {@link com.bloomberg.bmq.impl.PutPoster}
+ * for batching and sending PUT messages, {@link com.bloomberg.bmq.impl.QueueStateManager} for
+ * tracking queue states, and {@link com.bloomberg.bmq.impl.InboundEventBuffer} for buffering
+ * incoming events with watermark-based flow control.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */

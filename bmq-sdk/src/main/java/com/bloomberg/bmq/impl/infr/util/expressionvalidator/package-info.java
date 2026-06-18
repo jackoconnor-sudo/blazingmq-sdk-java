@@ -22,8 +22,8 @@
  * com.bloomberg.bmq.impl.infr.util.expressionvalidator.ExpressionValidator} for performing the
  * validation, {@link com.bloomberg.bmq.impl.infr.util.expressionvalidator.Token} for tokenized
  * expression elements, and {@link
- * com.bloomberg.bmq.impl.infr.util.expressionvalidator.ValidationResult} for reporting
- * validation outcomes.
+ * com.bloomberg.bmq.impl.infr.util.expressionvalidator.ValidationResult} for reporting validation
+ * outcomes.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */

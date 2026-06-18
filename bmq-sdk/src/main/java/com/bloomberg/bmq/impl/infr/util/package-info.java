@@ -21,8 +21,7 @@
  * com.bloomberg.bmq.impl.infr.util.Argument} for parameter validation, {@link
  * com.bloomberg.bmq.impl.infr.util.BitUtil} for bit manipulation, {@link
  * com.bloomberg.bmq.impl.infr.util.Compression} for data compression support, and {@link
- * com.bloomberg.bmq.impl.infr.util.Limits} for size constants used throughout the protocol
- * layer.
+ * com.bloomberg.bmq.impl.infr.util.Limits} for size constants used throughout the protocol layer.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */

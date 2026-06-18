@@ -19,8 +19,8 @@
  *
  * <p>This package defines the internal contracts used between SDK components, including {@link
  * com.bloomberg.bmq.impl.intf.BrokerConnection} for broker communication, {@link
- * com.bloomberg.bmq.impl.intf.BrokerConnectionFSM} for connection state machine transitions,
- * {@link com.bloomberg.bmq.impl.intf.QueueHandle} for queue operations, and {@link
+ * com.bloomberg.bmq.impl.intf.BrokerConnectionFSM} for connection state machine transitions, {@link
+ * com.bloomberg.bmq.impl.intf.QueueHandle} for queue operations, and {@link
  * com.bloomberg.bmq.impl.intf.SessionEventHandler} for handling wire protocol I/O events.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.

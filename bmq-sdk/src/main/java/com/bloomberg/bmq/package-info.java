@@ -18,11 +18,10 @@
  * Main public API for the BlazingMQ Java SDK.
  *
  * <p>This package contains the primary interfaces and classes for interacting with a BlazingMQ
- * broker, including {@link com.bloomberg.bmq.AbstractSession} and {@link
- * com.bloomberg.bmq.Session} for session management, {@link com.bloomberg.bmq.Queue} for queue
- * operations, message types such as {@link com.bloomberg.bmq.PutMessage}, {@link
- * com.bloomberg.bmq.PushMessage}, and {@link com.bloomberg.bmq.AckMessage}, as well as
- * configuration objects like {@link com.bloomberg.bmq.SessionOptions} and {@link
- * com.bloomberg.bmq.QueueOptions}.
+ * broker, including {@link com.bloomberg.bmq.AbstractSession} and {@link com.bloomberg.bmq.Session}
+ * for session management, {@link com.bloomberg.bmq.Queue} for queue operations, message types such
+ * as {@link com.bloomberg.bmq.PutMessage}, {@link com.bloomberg.bmq.PushMessage}, and {@link
+ * com.bloomberg.bmq.AckMessage}, as well as configuration objects like {@link
+ * com.bloomberg.bmq.SessionOptions} and {@link com.bloomberg.bmq.QueueOptions}.
  */
 package com.bloomberg.bmq;

@@ -20,11 +20,10 @@
  * <p>This package contains the data classes representing JSON-encoded control messages exchanged
  * during broker negotiation and queue management. Key types include {@link
  * com.bloomberg.bmq.impl.infr.msg.ClientIdentity} for session identification, {@link
- * com.bloomberg.bmq.impl.infr.msg.OpenQueue} and {@link
- * com.bloomberg.bmq.impl.infr.msg.CloseQueue} for queue lifecycle operations, {@link
- * com.bloomberg.bmq.impl.infr.msg.ConfigureStream} for stream configuration, and {@link
- * com.bloomberg.bmq.impl.infr.msg.Status}/{@link com.bloomberg.bmq.impl.infr.msg.StatusCategory}
- * for response status reporting.
+ * com.bloomberg.bmq.impl.infr.msg.OpenQueue} and {@link com.bloomberg.bmq.impl.infr.msg.CloseQueue}
+ * for queue lifecycle operations, {@link com.bloomberg.bmq.impl.infr.msg.ConfigureStream} for
+ * stream configuration, and {@link com.bloomberg.bmq.impl.infr.msg.Status}/{@link
+ * com.bloomberg.bmq.impl.infr.msg.StatusCategory} for response status reporting.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */

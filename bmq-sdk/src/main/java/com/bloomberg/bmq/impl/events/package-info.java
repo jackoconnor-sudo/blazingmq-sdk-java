@@ -21,8 +21,8 @@
  * com.bloomberg.bmq.impl.events.BrokerSessionEvent} for session-level notifications, {@link
  * com.bloomberg.bmq.impl.events.AckMessageEvent} and {@link
  * com.bloomberg.bmq.impl.events.PushMessageEvent} for message delivery events, and {@link
- * com.bloomberg.bmq.impl.events.QueueControlEvent} for queue lifecycle events. Each event type
- * has a corresponding handler interface for dispatching.
+ * com.bloomberg.bmq.impl.events.QueueControlEvent} for queue lifecycle events. Each event type has
+ * a corresponding handler interface for dispatching.
  *
  * <p><b>Note:</b> This package is internal to the SDK and is not part of the public API.
  */
