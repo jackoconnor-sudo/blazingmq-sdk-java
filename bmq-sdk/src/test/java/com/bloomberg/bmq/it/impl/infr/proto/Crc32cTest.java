@@ -76,14 +76,10 @@ class Crc32cTest {
             assertFalse(Crc32c.isJdkImplementation());
         } else {
             // We are running integration test.
-            // if JDK8 is used to build and verify, then the generated JAR file contains only Java8
-            // version of Crc32c class (3rd party implementation).
-            // If JDK11 or above is used, then the generated JAR file also contains Java9 version of
-            // Crc32c (native JDK implementation) and it should be used by JVM.
+            // Since minimum JDK is now 11, the multi-release JAR always contains the Java9+
+            // version of Crc32c (native JDK implementation) and it should be used by JVM.
             logger.info("Running Crc32cTest as a part of Jar file");
-            boolean isJava9orAbove =
-                    SystemUtil.getJavaVersion().compareTo(SystemUtil.JavaVersion.JAVA_8) > 0;
-            assertEquals(isJava9orAbove, Crc32c.isJdkImplementation());
+            assertTrue(Crc32c.isJdkImplementation());
         }
     }
 

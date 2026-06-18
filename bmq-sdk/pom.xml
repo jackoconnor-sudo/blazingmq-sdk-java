@@ -93,7 +93,7 @@ limitations under the License. -->
 
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -303,12 +303,12 @@ limitations under the License. -->
 
   <profiles>
     <profile>
-      <!-- This profile is activated with JDK9 and above (actually, only JDK11 and JDK17 are supported).
-           It allows to produce JAR file which contains Java8 and Java9 versions of Crc32c class by doing the following:
-           - add compiler extra execution step in order to compile classes in "java9" directory
-           - modify "jar plugin" configuration to produce multi release jar file
-           - modify "jacoco plugin" configuration to exclude Java9 Crc32c class version from unit tests report and
-             Java8 version from integration tests report -->
+      <!-- This profile is activated with JDK11 and above (JDK11, JDK17, JDK21 are supported).
+           It produces a multi-release JAR with Java 9+ optimized Crc32c class by:
+           - adding a compiler execution step to compile classes in "java9" directory
+           - modifying "jar plugin" configuration to produce a multi-release jar file
+           - modifying "jacoco plugin" configuration to exclude Java9 Crc32c class version from unit tests report and
+             base version from integration tests report -->
       <id>java9-crc32c</id>
       <activation>
         <jdk>[9,)</jdk>
