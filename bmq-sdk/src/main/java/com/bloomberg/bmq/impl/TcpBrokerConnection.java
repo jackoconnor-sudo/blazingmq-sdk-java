@@ -15,6 +15,7 @@
  */
 package com.bloomberg.bmq.impl;
 
+import com.bloomberg.bmq.BrokerConnectionException;
 import com.bloomberg.bmq.ResultCodes.GenericResult;
 import com.bloomberg.bmq.impl.infr.msg.BrokerResponse;
 import com.bloomberg.bmq.impl.infr.msg.ClientIdentity;
@@ -629,7 +630,7 @@ public class TcpBrokerConnection
             protocolEventTcpReader.read(completionStatus, data);
         } catch (IOException ex) {
             // TODO: reconnect logic or some proper handling
-            throw new RuntimeException("Read failed for TcpBrokerConnection", ex);
+            throw new BrokerConnectionException("Read failed for TcpBrokerConnection", ex);
         }
     }
 }

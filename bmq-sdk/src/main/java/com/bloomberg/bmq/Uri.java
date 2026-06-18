@@ -136,9 +136,9 @@ public class Uri {
             tier = tierStr;
             uri = new URI(uriStr);
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Failed to create URI", e);
+            throw new ProtocolException("Failed to create URI", e);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Wrong URI string format", e);
+            throw new ProtocolException("Wrong URI string format", e);
         }
     }
 

@@ -15,6 +15,7 @@
  */
 package com.bloomberg.bmq.impl.infr.proto;
 
+import com.bloomberg.bmq.ProtocolException;
 import com.bloomberg.bmq.impl.infr.io.ByteBufferInputStream;
 import com.bloomberg.bmq.impl.infr.io.ByteBufferOutputStream;
 import com.bloomberg.bmq.impl.infr.util.Compression;
@@ -58,7 +59,7 @@ public class ApplicationData {
 
             final int numRead = bbis.read(payload);
             if (numRead != payload.length) {
-                throw new RuntimeException(
+                throw new ProtocolException(
                         "Unexpected error in ApplicationData::setPayload: "
                                 + " expected to read "
                                 + payload.length
@@ -110,7 +111,7 @@ public class ApplicationData {
             try {
                 decompressData();
             } catch (IOException e) {
-                throw new RuntimeException("Failed to decompress payload", e);
+                throw new ProtocolException("Failed to decompress payload", e);
             }
         }
 

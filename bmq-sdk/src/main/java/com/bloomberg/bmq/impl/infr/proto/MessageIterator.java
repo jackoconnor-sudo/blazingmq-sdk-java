@@ -15,6 +15,7 @@
  */
 package com.bloomberg.bmq.impl.infr.proto;
 
+import com.bloomberg.bmq.ProtocolException;
 import com.bloomberg.bmq.impl.infr.proto.intf.Streamable;
 import com.bloomberg.bmq.impl.infr.util.Argument;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public abstract class MessageIterator {
             ev.reset();
             event = ev;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to reset event", e);
+            throw new ProtocolException("Failed to reset event", e);
         }
     }
 

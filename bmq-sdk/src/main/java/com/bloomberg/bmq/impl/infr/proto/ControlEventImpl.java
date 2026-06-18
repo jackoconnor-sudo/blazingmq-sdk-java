@@ -15,6 +15,7 @@
  */
 package com.bloomberg.bmq.impl.infr.proto;
 
+import com.bloomberg.bmq.ProtocolException;
 import com.bloomberg.bmq.impl.infr.codec.JsonDecoderUtil;
 import com.bloomberg.bmq.impl.infr.msg.ControlMessageChoice;
 import com.bloomberg.bmq.impl.infr.msg.NegotiationMessageChoice;
@@ -40,7 +41,7 @@ public class ControlEventImpl extends EventImpl {
         try {
             json = JsonDecoderUtil.getJsonFromInputStream(blob);
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            throw new ProtocolException("Failed to decode control event JSON", ex);
         }
     }
 
