@@ -85,34 +85,30 @@ etc) can be found [here](https://www.github.com/bloomberg/blazingmq).
 
 The SDK code supports building with the following kits:
 
-- *JDK8*
-  - Builds the code with these compiler parameters:
-    - `source=8` (which allows up to *Java 8* features)
-    - `target=8` (which generates JVM 8 bytecode)
-- *JDK11* and *JDK17*
-  - Builds the code with `release=8` (generated JVM 8 compatible code) plus
-    builds the code in `java9` directory with `release=9`.  This way multi
-    release JAR is produced which contains Java8 and Java9 versions of `Crc32c`
-    class
+- *JDK11* (minimum), *JDK17*, and *JDK21*
+  - Builds the code with `release=11` (generates JVM 11 compatible bytecode)
+    plus builds the code in `java9` directory with `release=9`.  This way a
+    multi-release JAR is produced which contains optimized `Crc32c`
+    implementations for JDK 9+.
 
 By default, JDK defined in `JAVA_HOME` is used.  When running any maven
-command, corresponding profile is activated depending on the JDK version.  To
-get a list of active profiles run the following command:
+command, the corresponding profile is activated depending on the JDK version.
+To get a list of active profiles run the following command:
 
 ```sh
-# On this machine JAVA_HOME is set to JDK8.
+# On this machine JAVA_HOME is set to JDK11.
 $ mvn help:active-profiles
 ...
 The following profiles are active:
 
- - JDK8 (source: com.bloomberg.bmq:bmq-sdk:X.Y.Z-SNAPSHOT)
+ - JDK11 (source: com.bloomberg.bmq:bmq-sdk:X.Y.Z-SNAPSHOT)
 ```
 
 To use another JDK, override `JAVA_HOME` env variable. For instance:
 
 ```sh
-# clean output and compile the code using JDK 11
-$ JAVA_HOME=${PATH_TO_JDK11} mvn clean compile
+# clean output and compile the code using JDK 21
+$ JAVA_HOME=${PATH_TO_JDK21} mvn clean compile
 ...
 [INFO] BUILD SUCCESS
 ...

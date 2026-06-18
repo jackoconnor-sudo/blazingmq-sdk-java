@@ -29,9 +29,9 @@ public class SystemUtil {
 
     public enum JavaVersion {
         JAVA_UNSUPPORTED(""),
-        JAVA_8("1.8"),
         JAVA_11("11"),
-        JAVA_17("17");
+        JAVA_17("17"),
+        JAVA_21("21");
 
         private final String major;
 
