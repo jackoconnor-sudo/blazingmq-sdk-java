@@ -169,7 +169,10 @@ public class QueueManager {
         Argument.expectNonNull(queue.getUri().canonical(), "queue uri canonical");
 
         synchronized (lock) {
-            // TODO: logic for multiple subQueues
+            // Multiple subQueues may share the same canonical URI (each identified
+            // by a unique appId/subQueueId). Only the targeted sub-queue entry is
+            // removed; the QueueInfo and URI mapping are retained as long as other
+            // sub-queues remain active.
             QueueInfo qInfo = uriMap.get(queue.getUri().canonical());
             if (qInfo == null) {
                 return false;
@@ -319,20 +322,26 @@ public class QueueManager {
      * @return QueueId object
      */
     public QueueId generateNextQueueId(Uri uri) {
-        // TODO: implement complete logic
-        QueueInfo qInfo = uriMap.get(uri.canonical());
-        int subQueueId = 0;
-        if (qInfo != null) {
-            if (!uri.id().isEmpty()) {
-                subQueueId = qInfo.getNextSubQueueId();
+        synchronized (lock) {
+            QueueInfo qInfo = uriMap.get(uri.canonical());
+            int subQueueId = 0;
+            if (qInfo != null) {
+                // URI already tracked: reuse the existing queueId. For consumer
+                // sub-queues (non-empty appId), allocate the next subQueueId;
+                // producers and default consumers use subQueueId 0.
+                if (!uri.id().isEmpty()) {
+                    subQueueId = qInfo.getNextSubQueueId();
+                }
+                return QueueId.createInstance(qInfo.getQueueId(), subQueueId);
+            } else {
+                // New canonical URI: allocate a fresh queueId. Consumer sub-queues
+                // start at INITIAL_CONSUMER_SUBQUEUE_ID; producers use 0.
+                if (!uri.id().isEmpty()) {
+                    subQueueId = QueueInfo.INITIAL_CONSUMER_SUBQUEUE_ID;
+                }
+                int queueId = nextQueueId.getAndIncrement();
+                return QueueId.createInstance(queueId, subQueueId);
             }
-            return QueueId.createInstance(qInfo.getQueueId(), subQueueId);
-        } else {
-            if (!uri.id().isEmpty()) {
-                subQueueId = QueueInfo.INITIAL_CONSUMER_SUBQUEUE_ID;
-            }
-            int queueId = nextQueueId.getAndIncrement();
-            return QueueId.createInstance(queueId, subQueueId);
         }
     }
 

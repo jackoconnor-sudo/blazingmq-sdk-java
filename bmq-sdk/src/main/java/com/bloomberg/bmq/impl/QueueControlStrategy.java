@@ -339,7 +339,9 @@ public abstract class QueueControlStrategy<RESULT extends GenericCode> {
         return params;
     }
 
-    // TODO: discuss redundancy of StatusCategory/GenericResult
+    // StatusCategory is the internal protocol-level status (broker responses), while
+    // GenericResult is the public API contract. This overload provides a convenient
+    // bridge so callers with a StatusCategory do not need to convert explicitly.
     protected void resultHook(StatusCategory statusCategory) {
         GenericResult genericResult = ResultCodeUtils.toGenericResult(statusCategory);
         resultHook(genericResult);
