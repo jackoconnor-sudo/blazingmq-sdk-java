@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
@@ -42,7 +45,9 @@ import org.slf4j.LoggerFactory;
 public class QueueManager {
     static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final Object lock;
+    private final ReadWriteLock rwLock;
+    private final Lock readLock;
+    private final Lock writeLock;
     private Map<String, Integer> uriSubStreamCount;
     private Map<String, QueueInfo> uriMap;
     private Map<QueueId, QueueImpl> keyQueueIdMap;
@@ -59,13 +64,16 @@ public class QueueManager {
         expiredQueueMap = new HashMap<>();
         subscriptionIdMap = new HashMap<>();
         appId_subQId_Map = new HashMap<>();
-        lock = new Object();
+        rwLock = new ReentrantReadWriteLock();
+        readLock = rwLock.readLock();
+        writeLock = rwLock.writeLock();
         nextQueueId = new AtomicInteger(0);
     }
 
     /** Reset queue manager state. */
     public void reset() {
-        synchronized (lock) {
+        writeLock.lock();
+        try {
             uriSubStreamCount = new HashMap<>();
             uriMap = new TreeMap<>();
             keyQueueIdMap = new HashMap<>();
@@ -73,6 +81,8 @@ public class QueueManager {
             subscriptionIdMap = new HashMap<>();
             appId_subQId_Map = new HashMap<>();
             nextQueueId = new AtomicInteger(0);
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -94,7 +104,8 @@ public class QueueManager {
      * @return 'true' on success, 'false' on failure.
      */
     public boolean insert(QueueImpl queue) {
-        synchronized (lock) {
+        writeLock.lock();
+        try {
             Uri uri = queue.getUri();
             String uriString = uri.canonical();
             QueueInfo queueInfo = uriMap.get(uriString);
@@ -115,15 +126,20 @@ public class QueueManager {
                 return false;
             }
             subQueueIdsMap.put(uri.id(), queue.getSubQueueId());
+        } finally {
+            writeLock.unlock();
         }
         return true;
     }
 
     public boolean update(QueueImpl queue) {
-        synchronized (lock) {
+        writeLock.lock();
+        try {
             for (Integer sId : queue.getSubscriptionIdMap().keySet()) {
                 subscriptionIdMap.put(sId, queue);
             }
+        } finally {
+            writeLock.unlock();
         }
         return true;
     }
@@ -138,8 +154,9 @@ public class QueueManager {
      */
     public boolean insertExpired(QueueImpl queue) {
         QueueId queueId = queue.getFullQueueId();
-        synchronized (lock) {
-            if (findExpiredByQueueId(queueId) != null) {
+        writeLock.lock();
+        try {
+            if (expiredQueueMap.get(queueId) != null) {
                 return false;
             }
             expiredQueueMap.put(queueId, queue);
@@ -151,6 +168,8 @@ public class QueueManager {
                     appId_subQId_Map.put(appId, queueId.getSubQId());
                 }
             }
+        } finally {
+            writeLock.unlock();
         }
         return true;
     }
@@ -168,7 +187,8 @@ public class QueueManager {
         Argument.expectNonNull(queue.getUri(), "queue uri");
         Argument.expectNonNull(queue.getUri().canonical(), "queue uri canonical");
 
-        synchronized (lock) {
+        writeLock.lock();
+        try {
             // TODO: logic for multiple subQueues
             QueueInfo qInfo = uriMap.get(queue.getUri().canonical());
             if (qInfo == null) {
@@ -205,6 +225,8 @@ public class QueueManager {
                                 "Wrong QueueIds: %d != %d",
                                 qInfo.getQueueId(), qHandle.getQueueId()));
             }
+        } finally {
+            writeLock.unlock();
         }
         return true;
     }
@@ -220,7 +242,8 @@ public class QueueManager {
     public boolean removeExpired(QueueImpl queue) {
         Argument.expectNonNull(queue, "queue");
 
-        synchronized (lock) {
+        writeLock.lock();
+        try {
             QueueId queueKey = queue.getFullQueueId();
             QueueImpl qHandle = expiredQueueMap.remove(queueKey);
             if (qHandle == null) {
@@ -240,6 +263,8 @@ public class QueueManager {
                     appId_subQId_Map.remove(appId);
                 }
             }
+        } finally {
+            writeLock.unlock();
         }
         return true;
     }
@@ -253,14 +278,20 @@ public class QueueManager {
      * @return QueueImpl object if it is found, otherwise null.
      */
     public QueueImpl findByQueueId(QueueId queueId) {
-        synchronized (lock) {
+        readLock.lock();
+        try {
             return keyQueueIdMap.get(queueId);
+        } finally {
+            readLock.unlock();
         }
     }
 
     public QueueImpl findBySubscriptionId(int subscriptionId) {
-        synchronized (lock) {
+        readLock.lock();
+        try {
             return subscriptionIdMap.get(subscriptionId);
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -275,7 +306,8 @@ public class QueueManager {
     public QueueImpl findByUri(Uri uri) {
         Argument.expectNonNull(uri, "uri");
 
-        synchronized (lock) {
+        readLock.lock();
+        try {
             QueueInfo queueInfo = uriMap.get(uri.canonical());
             if (queueInfo == null) {
                 return null;
@@ -286,13 +318,18 @@ public class QueueManager {
             }
             int qId = queueInfo.getQueueId();
             QueueId queueId = QueueId.createInstance(qId, queueSubId);
-            return findByQueueId(queueId);
+            return keyQueueIdMap.get(queueId);
+        } finally {
+            readLock.unlock();
         }
     }
 
     public Integer findSubQId(String appId) {
-        synchronized (lock) {
+        readLock.lock();
+        try {
             return appId_subQId_Map.get(appId);
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -305,8 +342,11 @@ public class QueueManager {
      * @return QueueImpl object if it is found, otherwise null.
      */
     public QueueImpl findExpiredByQueueId(QueueId queueId) {
-        synchronized (lock) {
+        readLock.lock();
+        try {
             return expiredQueueMap.get(queueId);
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -344,10 +384,13 @@ public class QueueManager {
      * @return list of opened queues
      */
     public Collection<QueueImpl> getOpenedQueues() {
-        synchronized (lock) {
+        readLock.lock();
+        try {
             return keyQueueIdMap.values().stream()
                     .filter(QueueImpl::isOpened)
                     .collect(Collectors.toList());
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -359,8 +402,11 @@ public class QueueManager {
      * @return list of all queues
      */
     public Collection<QueueImpl> getAllQueues() {
-        synchronized (lock) {
+        readLock.lock();
+        try {
             return keyQueueIdMap.values();
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -378,8 +424,11 @@ public class QueueManager {
      */
     public void incrementSubStreamCount(String uri) {
         Argument.expectNonNull(uri, "uri");
-        synchronized (lock) {
+        writeLock.lock();
+        try {
             uriSubStreamCount.merge(uri, 1, Integer::sum);
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -393,7 +442,8 @@ public class QueueManager {
     public void decrementSubStreamCount(String uri) {
         // todo check increment for subscriptions
         Argument.expectNonNull(uri, "uri");
-        synchronized (lock) {
+        writeLock.lock();
+        try {
             Integer currentValue = uriSubStreamCount.get(uri);
             if (currentValue == null) {
                 throw new IllegalStateException("There are no substreams for such uri");
@@ -404,6 +454,8 @@ public class QueueManager {
             } else {
                 uriSubStreamCount.put(uri, currentValue - 1);
             }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -417,13 +469,16 @@ public class QueueManager {
      */
     public int getSubStreamCount(String uri) {
         Argument.expectNonNull(uri, "uri");
-        synchronized (lock) {
+        readLock.lock();
+        try {
             Integer currentValue = uriSubStreamCount.get(uri);
             if (currentValue == null) {
                 return 0;
             } else {
                 return currentValue;
             }
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -436,8 +491,11 @@ public class QueueManager {
      */
     public void resetSubStreamCount(String uri) {
         Argument.expectNonNull(uri, "uri");
-        synchronized (lock) {
+        writeLock.lock();
+        try {
             uriSubStreamCount.remove(uri);
+        } finally {
+            writeLock.unlock();
         }
     }
 }
