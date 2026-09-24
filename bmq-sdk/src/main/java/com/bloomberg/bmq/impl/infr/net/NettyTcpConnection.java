@@ -506,7 +506,7 @@ public final class NettyTcpConnection extends ChannelInboundHandlerAdapter
         EventLoopGroup el;
         long timeout;
         synchronized (lock) {
-            if (Thread.currentThread().getId() == ioThreadId) {
+            if (Thread.currentThread().threadId() == ioThreadId) {
                 throw new IllegalStateException("Cannot invoke 'linger' from the IO thread.");
             }
 
@@ -644,7 +644,7 @@ public final class NettyTcpConnection extends ChannelInboundHandlerAdapter
         Semaphore sema = null;
 
         synchronized (lock) {
-            if (Thread.currentThread().getId() == ioThreadId) {
+            if (Thread.currentThread().threadId() == ioThreadId) {
                 throw new IllegalStateException(
                         "Cannot invoke 'waitUntilWritable' from the IO thread.");
             }
@@ -982,7 +982,7 @@ public final class NettyTcpConnection extends ChannelInboundHandlerAdapter
                 scheduleConnect = true;
             } else if (future.isSuccess()) {
                 state = ChannelState.CONNECTED;
-                ioThreadId = Thread.currentThread().getId(); // ok to rewrite
+                ioThreadId = Thread.currentThread().threadId(); // ok to rewrite
 
                 ChannelFuture closeFuture = future.channel().closeFuture();
 

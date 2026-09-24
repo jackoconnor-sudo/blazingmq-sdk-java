@@ -42,10 +42,14 @@ public class PushMessageImpl implements Streamable {
 
     public PushMessageImpl() {
         compressionType = CompressionAlgorithmType.E_NONE;
-        reset();
+        init();
     }
 
     public void reset() {
+        init();
+    }
+
+    private void init() {
         header = new PushHeader();
         appData = new ApplicationData();
         options = new Options();

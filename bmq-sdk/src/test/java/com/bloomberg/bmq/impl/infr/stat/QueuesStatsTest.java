@@ -61,7 +61,7 @@ class QueuesStatsTest {
             return CompletableFuture.runAsync(
                     () -> {
                         sleep(100);
-                        logger.info("PUT from thread {}", Thread.currentThread().getId());
+                        logger.info("PUT from thread {}", Thread.currentThread().threadId());
 
                         for (int i = 0; i < msgCount; i++) {
                             stats.onPutMessage(queueId, appDataSize, ratio);
@@ -74,7 +74,7 @@ class QueuesStatsTest {
             return CompletableFuture.runAsync(
                     () -> {
                         sleep(100);
-                        logger.info("PUSH from thread {}", Thread.currentThread().getId());
+                        logger.info("PUSH from thread {}", Thread.currentThread().threadId());
 
                         for (int i = 0; i < msgCount; i++) {
                             stats.onPushMessage(queueId, appDataSize);

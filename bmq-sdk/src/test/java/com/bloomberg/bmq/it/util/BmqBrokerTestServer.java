@@ -24,7 +24,6 @@ import com.bloomberg.bmq.impl.infr.util.SystemUtil;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.nio.file.Files;
@@ -85,14 +84,8 @@ public class BmqBrokerTestServer implements BmqBroker {
 
     private static long getPidOfProcess(Process p) {
         try {
-            if (p.getClass().getName().equals("java.lang.UNIXProcess")) {
-                Field f = p.getClass().getDeclaredField("pid");
-                f.setAccessible(true);
-                long pid = f.getLong(p);
-                f.setAccessible(false);
-                return pid;
-            }
-        } catch (Exception e) {
+            return p.pid();
+        } catch (UnsupportedOperationException e) {
             logger.error("Failed to get process PID");
         }
         return DEFAULT_INVALID_PID;
@@ -267,7 +260,8 @@ public class BmqBrokerTestServer implements BmqBroker {
             if (process != null) {
                 logger.info("Stopping broker, pid [{}].", pid);
                 if (pid > 0) {
-                    Runtime.getRuntime().exec("kill -SIGTERM " + pid);
+                    Runtime.getRuntime()
+                            .exec(new String[] {"kill", "-SIGTERM", Integer.toString(pid)});
                 } else {
                     process.destroy();
                 }

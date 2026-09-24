@@ -49,7 +49,7 @@ public class EventsStatsTest {
             return CompletableFuture.runAsync(
                     () -> {
                         sleep(100);
-                        logger.info("PUT from thread {}", Thread.currentThread().getId());
+                        logger.info("PUT from thread {}", Thread.currentThread().threadId());
                         stats.onEvent(EventType.PUT, size, msgCount);
                     },
                     userThreadPool);
@@ -59,7 +59,7 @@ public class EventsStatsTest {
             return CompletableFuture.runAsync(
                     () -> {
                         sleep(100);
-                        logger.info("CONTROL from thread {}", Thread.currentThread().getId());
+                        logger.info("CONTROL from thread {}", Thread.currentThread().threadId());
                         stats.onEvent(EventType.CONTROL, size, 0);
                     },
                     sessionScheduler);
@@ -69,7 +69,7 @@ public class EventsStatsTest {
             return CompletableFuture.runAsync(
                     () -> {
                         sleep(100);
-                        logger.info("ACK from thread {}", Thread.currentThread().getId());
+                        logger.info("ACK from thread {}", Thread.currentThread().threadId());
                         stats.onEvent(EventType.ACK, size, msgCount);
                     },
                     sessionScheduler);
@@ -79,7 +79,7 @@ public class EventsStatsTest {
             return CompletableFuture.runAsync(
                     () -> {
                         sleep(100);
-                        logger.info("PUSH from thread {}", Thread.currentThread().getId());
+                        logger.info("PUSH from thread {}", Thread.currentThread().threadId());
                         stats.onEvent(EventType.PUSH, size, msgCount);
                     },
                     sessionScheduler);
@@ -89,7 +89,7 @@ public class EventsStatsTest {
             return CompletableFuture.runAsync(
                     () -> {
                         sleep(100);
-                        logger.info("CONFIRM from thread {}", Thread.currentThread().getId());
+                        logger.info("CONFIRM from thread {}", Thread.currentThread().threadId());
                         stats.onEvent(EventType.CONFIRM, size, msgCount);
                     },
                     userThreadPool);
