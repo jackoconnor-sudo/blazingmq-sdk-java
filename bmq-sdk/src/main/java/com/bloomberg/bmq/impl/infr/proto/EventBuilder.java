@@ -26,10 +26,14 @@ public abstract class EventBuilder {
     protected ByteBufferOutputStream bbos;
 
     protected EventBuilder(EventType type) {
-        reset(type);
+        init(type);
     }
 
     public void reset(EventType type) {
+        init(type);
+    }
+
+    private void init(EventType type) {
         eventHeader = new EventHeader();
         eventHeader.setType(type);
         msgCount = 0;

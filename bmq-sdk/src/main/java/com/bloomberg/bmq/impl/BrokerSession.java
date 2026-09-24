@@ -112,7 +112,7 @@ public final class BrokerSession
     private int numPendingHostHealthRequests = 0;
 
     public boolean isInSessionExecutor() {
-        return threadId == Thread.currentThread().getId();
+        return threadId == Thread.currentThread().threadId();
     }
 
     @FunctionalInterface
@@ -180,7 +180,7 @@ public final class BrokerSession
             ScheduledExecutorService scheduler,
             EventHandler eventHandler) {
         CompletableFuture<Long> completableFuture = new CompletableFuture<>();
-        scheduler.execute(() -> completableFuture.complete(Thread.currentThread().getId()));
+        scheduler.execute(() -> completableFuture.complete(Thread.currentThread().threadId()));
         long threadId;
         try {
             threadId = BmqFuture.get(completableFuture, BmqFuture.s_DEFAULT_TIMEOUT);

@@ -15,7 +15,7 @@
  */
 package com.bloomberg.bmq.impl.infr.msg;
 
-public class NegotiationMessageChoice {
+public final class NegotiationMessageChoice {
 
     private ClientIdentity clientIdentity;
     private BrokerResponse brokerResponse;

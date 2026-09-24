@@ -15,7 +15,7 @@
  */
 package com.bloomberg.bmq.impl.infr.msg;
 
-public class ControlMessageChoice {
+public final class ControlMessageChoice {
 
     private Integer rId;
     private Status status;
